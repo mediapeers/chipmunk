@@ -1,0 +1,41 @@
+{
+  "name": "chipmunk",
+  "version": "0.0.1",
+  "description": "helper library to talk to mediastore backends",
+  "main": "build/src/index.js",
+  "scripts": {
+    "postinstall": "rm -rf node_modules/chipmunk && ln -s ../src node_modules/chipmunk",
+    "test": "mocha -r ts-node/register tests/**/*.test.ts --timeout 5000",
+    "test:watch": "mocha -r ts-node/register tests/**/*.test.ts --watch-extensions ts --watch -R min --timeout 5000",
+    "testWithCoverage": "nyc -r lcov -e .ts -x \"*.test.ts\" mocha -r ts-node/register tests/**/*.test.ts && nyc report"
+  },
+  "author": "johannes-kostas goetzinger",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/chai": "^4.1.7",
+    "@types/chai-as-promised": "^7.1.0",
+    "@types/lodash": "^4.14.123",
+    "@types/mocha": "^5.2.6",
+    "@types/nock": "^10.0.1",
+    "@types/node": "^11.13.7",
+    "@types/querystringify": "^2.0.0",
+    "@types/sinon": "^7.0.11",
+    "@types/superagent": "^4.1.1",
+    "@types/uri-templates": "^0.1.30",
+    "chai": "^4.2.0",
+    "chai-as-promised": "^7.1.1",
+    "mocha": "^6.1.4",
+    "nock": "^10.0.6",
+    "nyc": "^14.0.0",
+    "sinon": "^7.3.2",
+    "superdebug": "^2.2.0",
+    "ts-node": "^8.1.0",
+    "typescript": "^3.4.5"
+  },
+  "dependencies": {
+    "lodash": "^4.17.11",
+    "querystringify": "^2.1.1",
+    "superagent": "^5.0.2",
+    "uri-templates": "^0.2.0"
+  }
+}
