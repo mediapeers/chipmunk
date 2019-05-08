@@ -13,7 +13,7 @@ let chipmunk
     //const result = await ch.action('um.session', 'create', {
       //body: {
         //email: 'johannes.gotzinger@bydeluxe.com',
-        //password: 'F3434f18f946c8c5813b7e110c1x',
+        //password: 'xxx',
       //},
     //})
 

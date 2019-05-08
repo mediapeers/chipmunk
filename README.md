@@ -1,4 +1,4 @@
-# CHIPMONK
+# CHIPMUNK
 
 ## main goals
 
@@ -28,7 +28,7 @@ ch.req = (
   appAndModel: string,
   params: { [s: string]: any },
   options: { [s: string]: any }
-) => Promise<ChipmonkResult>
+) => Promise<ChipmunkResult>
 ```
 
 ```javascript
@@ -92,7 +92,7 @@ let users = [user1, user2, user3] // ..requested earlier
 user1['@organization'] // => { @id: 'https://url.to/organization/2' }
 user1.organization // => NotLoadedError!
 
-const orgResult = await ch.fetch(users, 'organization') // => returns all associated organizations as ChipmonkResult
+const orgResult = await ch.fetch(users, 'organization') // => returns all associated organizations as ChipmunkResult
 users = ch.assign(users, orgResult.objects)
 users[0].organization // => returns org of first user
 
