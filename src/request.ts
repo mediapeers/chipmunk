@@ -17,11 +17,13 @@ export const isNode = (): boolean => {
 
 export const request = (config: IConfig): SuperAgentStatic => {
   const req = superagent.agent()
-    //.use(superdebug(console.info))
+    .use(superdebug(console.info))
 
   req.set({ 'Accept-Encoding' : 'gzip,deflate' })
 
   each(config.headers, (value, key) => {
+    if (!value) return
+
     isPlainObject(value) ?
       req.set(key, stringify(value)) :
       req.set(key, value)

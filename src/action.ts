@@ -1,5 +1,6 @@
 import UriTemplate from 'uri-templates'
-import {each, filter, get, merge, first, isEmpty} from 'lodash'
+import {each, filter, get, merge, first, isEmpty, isPlainObject} from 'lodash'
+import {stringify} from 'querystringify'
 
 import {IConfig} from './config'
 import {request, run} from './request'
@@ -9,7 +10,7 @@ import format from './format'
 export interface IActionOpts {
   ROR?: boolean
   withoutSession?: boolean
-  headers?: { [s: string]: string }
+  headers?: { [s: string]: any }
   body?: { [s: string]: any }
   params?: { [s: string]: any }
 }
@@ -64,6 +65,8 @@ export default async (appModel: string, actionName: string, opts: IActionOpts, c
   const uriTemplate = UriTemplate(action.template)
   const params = merge({}, extractParamsFromBody(action, body), opts.params)
 
+  validateParams(action, params, config)
+
   const uri = uriTemplate.fillFromObject(params)
 
   let req
@@ -80,6 +83,15 @@ export default async (appModel: string, actionName: string, opts: IActionOpts, c
         .get(uri)
   }
 
+	if (!isEmpty(opts.headers)) {
+		each(opts.headers, (value, key) => {
+			if (!value) return
+
+			isPlainObject(value) ?
+				req.set(key, stringify(value)) :
+				req.set(key, value)
+		})
+	}
   if (config.timestamp) req.query({ t: config.timestamp })
 
   const response = await run(req)

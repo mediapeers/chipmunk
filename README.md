@@ -10,6 +10,9 @@
 * _viscacha_-like association resolve functionality
 * functional
 * simple interface for PUT/POST requests
+* proper error handling instead of non-resolving promises
+* no cookie management
+* optional ruby on rails object formatting, or implicitly via a flag in specifications indicating a specific action supports rails nested attributes
 
 ### interface
 
