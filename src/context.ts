@@ -1,4 +1,4 @@
-import {get, first} from 'lodash'
+import {get, first, reduce, merge} from 'lodash'
 import {IConfig} from './config'
 import {request, run} from './request'
 
@@ -25,7 +25,8 @@ export interface IAction {
 }
 
 export interface IContext {
-  properties: IProperty[]
+  properties: { [s:string]: IProperty }
+  associations: { [s:string]: IProperty }
   constants: { [s:string]: string[] }
   member_actions: IAction[]
   collection_actions: IAction[]
@@ -66,6 +67,10 @@ export default async (urlOrAppModel: string, config: IConfig):Promise<IContext> 
 
     return action
   }
+
+  context.associations = reduce(context.properties, (assocs, prop, name) => {
+    return uriCheck.test(prop.type) ? merge(assocs, { [name]: prop }) : assocs
+  }, {})
 
   return context
 }

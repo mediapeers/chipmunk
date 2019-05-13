@@ -7,24 +7,31 @@ import {request, run} from './request'
 import getContext, {IAction} from './context'
 import format from './format'
 
+export class NotLoadedError extends Error {}
+
 export interface IActionOpts {
   ROR?: boolean
   withoutSession?: boolean
   headers?: { [s: string]: any }
   body?: { [s: string]: any }
   params?: { [s: string]: any }
+  schema?: string
+}
+
+export interface IObject {
+  '@associations': { [s: string]: any }
+  [s: string]: any
 }
 
 export interface IResult {
-  object: any
-  objects: any[]
+  object: IObject
+  objects: IObject[]
   headers?: { [s: string]: string }
   aggregations?: any
 }
 
 const DEFAULT_OPTS: IActionOpts = {
   ROR: false,
-  withoutSession: false,
   params: {},
 }
 
@@ -56,6 +63,15 @@ const validateParams = (action: IAction, params, config): boolean => {
   return true
 }
 
+const associationNotLoaded = (name) => {
+  return () => {
+    const err = new NotLoadedError(`'${name}' association not loaded`)
+    err.name = 'NotLoadedError'
+
+    throw err
+  }
+}
+
 export default async (appModel: string, actionName: string, opts: IActionOpts, config: IConfig): Promise<IResult> => {
   opts = merge({}, DEFAULT_OPTS, opts)
 
@@ -73,32 +89,37 @@ export default async (appModel: string, actionName: string, opts: IActionOpts, c
 
   switch (action.method) {
     case 'POST':
-      req = request(config)
+      req = request(config, opts.headers)
         .post(uri)
         .send(body)
       break;
 
     default:
-      req = request(config)
+      req = request(config, opts.headers)
         .get(uri)
   }
 
-	if (!isEmpty(opts.headers)) {
-		each(opts.headers, (value, key) => {
-			if (!value) return
-
-			isPlainObject(value) ?
-				req.set(key, stringify(value)) :
-				req.set(key, value)
-		})
-	}
   if (config.timestamp) req.query({ t: config.timestamp })
 
   const response = await run(req)
   let objects = []
 
-  if (get(response, 'body.members'))      objects = response.body.members
+  if (get(response, 'body.members')) objects = response.body.members
   else if (!isEmpty(response.body))  objects = [response.body]
+
+  each(objects, (object) => {
+    object['@associations'] = {}
+
+    each(context.associations, (_def, name) => {
+      if (object[name]) {
+        object['@associations'][name] = object[name]
+      }
+
+      Object.defineProperty(object, name, {
+        get: () => associationNotLoaded(name)()
+      })
+    })
+  })
 
   const result: IResult = {
     objects,

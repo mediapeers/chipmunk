@@ -8,39 +8,44 @@ import {setup, matches} from './setup'
 const config = setup()
 let chipmunk
 
-//before(async () => {
-  //await chipmunk(async (ch) => {
-    //const result = await ch.action('um.session', 'create', {
-      //body: {
-        //email: 'johannes.gotzinger@bydeluxe.com',
-        //password: 'xxx',
-      //},
-    //})
-
-    //config = testConfig({
-      //headers: {
-        //'Session-Id': result.object.id
-      //}
-    //})
-  //})
-//})
-
 describe('action', () => {
   beforeEach(() => {
     chipmunk = createChipmunk(config)
   })
 
-  //afterEach(() => nock.cleanAll())
-
   describe('GET', () => {
     it('queries for users', async () => {
-      nock(config.endpoints.um)
+      const scope = nock(config.endpoints.um)
         .get(matches('/users'))
         .reply(200, { members: [ { id: 'first' }, { id: 'second' } ]})
 
       await chipmunk.run(async (ch) => {
         const result = await ch.action('um.user', 'query')
         expect(result.objects.length).to.be.gt(1)
+      })
+    })
+
+    it('throws if trying to access (not yet) resolved association data', async () => {
+      const scope = nock(config.endpoints.um)
+        .get(matches('/users'))
+        .reply(200, { members: [ { id: 'first' }, { id: 'second' } ]})
+
+      await chipmunk.run(async (ch) => {
+        const result = await ch.action('um.user', 'query')
+        expect(() => result.objects[0].organization).to.throw(/association not loaded/)
+        expect(() => result.objects[1].organization).to.throw(/association not loaded/)
+        expect(() => result.objects[1].country.name).to.throw(/association not loaded/)
+      })
+    })
+
+    it(`moves association reference into '@associations'`, async () => {
+      const scope = nock(config.endpoints.um)
+        .get(matches('/users'))
+        .reply(200, { members: [ { id: 'first', organization: { '@id': 'http://um.app/organization/1' } }, { id: 'second' } ]})
+
+      await chipmunk.run(async (ch) => {
+        const result = await ch.action('um.user', 'query')
+        expect(result.object['@associations'].organization).to.eql({ '@id': 'http://um.app/organization/1' })
       })
     })
 
@@ -93,14 +98,14 @@ describe('action', () => {
     })
 
 		// 'badheaders' option seems not to work with superagent :(
-    it.only('does not send a session id', async () => {
+    it('does not send a session id', async () => {
 			chipmunk.updateConfig({ headers: { 'Session-Id': '56BA' } })
 
-      nock(config.endpoints.um, {
-				badheaders: ['Session-Id'],
-			})
+      nock(config.endpoints.um)
+        // nock performs a string check on the value. meaning we have to check for Session-Id to equal to '' to verify it is not sent
+				.matchHeader('Session-Id', '')
         .get(matches('users'))
-        .reply(200, {})
+        .reply(404, {})
 
       const promise = chipmunk.action('um.user', 'query', { headers: { 'Session-Id': null } })
 			await expect(promise).to.be.rejected

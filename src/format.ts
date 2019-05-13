@@ -28,7 +28,7 @@ const cleanup = (object) => {
 
   const cleaned = {}
   each(object, (value, key) => {
-    if (key === 'errors' || isFunction(value)) {
+    if (/^\@/.test(key) || key === 'errors' || isFunction(value)) {
       // skip
     }
     else if (isArray(value)) {

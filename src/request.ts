@@ -1,6 +1,6 @@
 import superagent, {Request, Response, SuperAgentStatic, SuperAgentRequest} from 'superagent'
 import superdebug from 'superdebug'
-import {get, each, isPlainObject} from 'lodash'
+import {get, each, merge, isPlainObject} from 'lodash'
 import {stringify} from 'querystringify'
 import {IConfig} from './config'
 
@@ -15,13 +15,15 @@ export const isNode = (): boolean => {
   return typeof window === 'undefined'
 }
 
-export const request = (config: IConfig): SuperAgentStatic => {
+export const request = (config: IConfig, headers?: { [s: string]: any }): SuperAgentStatic => {
   const req = superagent.agent()
-    .use(superdebug(console.info))
+    //.use(superdebug(console.info))
 
   req.set({ 'Accept-Encoding' : 'gzip,deflate' })
 
-  each(config.headers, (value, key) => {
+  headers = merge({}, config.headers, headers)
+
+  each(headers, (value, key) => {
     if (!value) return
 
     isPlainObject(value) ?

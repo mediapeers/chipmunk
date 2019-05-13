@@ -1,7 +1,9 @@
 import config, {IConfig} from '../src/config'
-import {merge} from 'lodash'
+import {merge, isEmpty} from 'lodash'
 import chaiAsPromised from 'chai-as-promised'
-import chai from 'chai'
+import chai, {expect} from 'chai'
+import nock from 'nock'
+
 import chipmunk, {IChipmunk} from '../src'
 
 import {mockContexts} from './mocks'
@@ -25,6 +27,7 @@ export const setup = (overrides?: Partial<IConfig>): IConfig => {
   const conf = config(DEFAULT_CONFIG, overrides)
 
   before(() => {
+    nock.cleanAll()
     mockContexts(conf)
     chai.use(chaiAsPromised)
   })

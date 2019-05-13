@@ -20,6 +20,14 @@ describe('context', () => {
     })
   })
 
+  it('exposes associations', async () => {
+    await chipmunk.run(async (ch) => {
+      const userContext = await ch.context('um.user')
+      expect(userContext.associations.firt_name).to.be.undefined
+      expect(userContext.associations.organization).not.to.be.empty
+    })
+  })
+
   it('fails to find a random context', async () => {
     await chipmunk.run(async (ch) => {
       const promise = ch.context('um.foo')

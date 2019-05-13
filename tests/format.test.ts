@@ -17,6 +17,7 @@ describe('format', () => {
       isMale: () => true,
       brothers: [{}, { name: 'Lukas', errors: 2 }],
       errors: 'none',
+      '@associations': {},
     }
 
     const expected = {
