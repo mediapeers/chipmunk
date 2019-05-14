@@ -15,7 +15,7 @@ describe('action', () => {
 
   describe('GET', () => {
     it('queries for users', async () => {
-      const scope = nock(config.endpoints.um)
+      nock(config.endpoints.um)
         .get(matches('/users'))
         .reply(200, { members: [ { id: 'first' }, { id: 'second' } ]})
 
@@ -45,7 +45,7 @@ describe('action', () => {
 
       await chipmunk.run(async (ch) => {
         const result = await ch.action('um.user', 'query')
-        expect(result.object['@associations'].organization).to.eql({ '@id': 'http://um.app/organization/1' })
+        expect(result.object['@associations'].organization).to.eql('http://um.app/organization/1')
       })
     })
 

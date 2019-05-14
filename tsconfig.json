@@ -14,7 +14,8 @@
     "outDir": "build",
     "lib": ["es6", "es7", "dom"],
     "baseUrl": "src",
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "resolveJsonModule": true
   },
   "compilerOptsRef": {
     "noUnusedLocals": true,

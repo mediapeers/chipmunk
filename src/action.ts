@@ -1,5 +1,5 @@
 import UriTemplate from 'uri-templates'
-import {each, filter, get, merge, first, isEmpty, isPlainObject} from 'lodash'
+import {each, filter, get, merge, first, map, isArray, isEmpty, isPlainObject} from 'lodash'
 import {stringify} from 'querystringify'
 
 import {IConfig} from './config'
@@ -111,8 +111,9 @@ export default async (appModel: string, actionName: string, opts: IActionOpts, c
     object['@associations'] = {}
 
     each(context.associations, (_def, name) => {
+      const data = object[name]
       if (object[name]) {
-        object['@associations'][name] = object[name]
+        object['@associations'][name] = isArray(data) ? map(data, '@id') : get(data, '@id')
       }
 
       Object.defineProperty(object, name, {

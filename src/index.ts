@@ -1,11 +1,13 @@
 import context, {IContext} from './context'
 import action, {IResult, IActionOpts} from './action'
+import {fetch} from './association'
 import createConfig, {IConfig} from './config'
 
 export interface IInterface {
   config: IConfig
   context: (urlOrAppModel: string) => Promise<IContext>
   action: (appModel: string, actionName: string, opts?: IActionOpts) => Promise<IResult>
+  fetch: (objects: any[], name: string) => Promise<IResult>
 }
 
 export interface IChipmunk extends IInterface {
@@ -20,6 +22,7 @@ export default (...overrides: Partial<IConfig>[]): IChipmunk => {
     get config() { return config },
     context: (urlOrAppModel) => context(urlOrAppModel, config),
     action: (appModel, actionName, opts = {}) => action(appModel, actionName, opts, config),
+    fetch: (objects, name) => fetch(objects, name, config),
   }
 
   const updateConfig = (overrides) => {

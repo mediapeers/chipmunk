@@ -3,6 +3,9 @@ import {merge, isEmpty} from 'lodash'
 import chaiAsPromised from 'chai-as-promised'
 import chai, {expect} from 'chai'
 import nock from 'nock'
+import fs from 'fs'
+import yaml from 'js-yaml'
+import {execSync} from 'child_process'
 
 import chipmunk, {IChipmunk} from '../src'
 
@@ -37,4 +40,9 @@ export const setup = (overrides?: Partial<IConfig>): IConfig => {
 
 export const matches = (needle: string) => {
   return (uri) => uri.includes(needle)
+}
+
+export const readCredentials = () => {
+  const content = execSync('scrambler read tests/credentials.yml').toString()
+  return yaml.safeLoad(content)
 }
