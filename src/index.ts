@@ -13,7 +13,7 @@ export interface IInterface {
 
 export interface IChipmunk extends IInterface {
   updateConfig: (overrides?: Partial<IConfig>) => IConfig
-  run: (ch: IChipmunk) => Promise<any>
+  run: (ch: IChipmunk, errorHandler?: Function) => Promise<any>
 }
 
 export default (...overrides: Partial<IConfig>[]): IChipmunk => {
@@ -31,7 +31,7 @@ export default (...overrides: Partial<IConfig>[]): IChipmunk => {
     return config = createConfig(config, overrides)
   }
 
-  const run = async (block) => {
+  const run = async (block, errorHandler?) => {
     try {
       await block(ch)
     }
@@ -39,6 +39,8 @@ export default (...overrides: Partial<IConfig>[]): IChipmunk => {
       if (config.errorInterceptor) {
         if (config.errorInterceptor(e) === true) return
       }
+
+      if (errorHandler) return errorHandler(e)
 
       throw e
     }

@@ -52,38 +52,4 @@ describe('config', () => {
       expect(conf.cachePrefix).to.equal('anonymous')
     })
   })
-
-  describe('with error interceptor', () => {
-    it('ignores the error if the interceptor returns true', async () => {
-      chipmunk.updateConfig({ errorInterceptor: (err) => true })
-
-      const block = chipmunk.run(async (ch) => {
-        const context = await ch.context('um.foo')
-      })
-
-      await expect(block).to.eventually.be.fulfilled
-    })
-
-    it('throws an error if the interceptor does not return true', async () => {
-      chipmunk.updateConfig({ errorInterceptor: (err) => null })
-
-      const block = chipmunk.run(async (ch) => {
-        const context = await ch.context('um.foo')
-      })
-
-      await expect(block).to.be.rejectedWith('Not Found')
-    })
-
-    // NOTE: this is an example how differentiate request specific errors from other errors..
-    it('throws an error if the original error was not because of an unsuccessful request', async () => {
-      chipmunk.updateConfig({ errorInterceptor: (err) => err.name === 'RequestError' })
-
-      const block = chipmunk.run(async (ch) => {
-        throw new Error('random error')
-        const context = await ch.context('um.foo')
-      })
-
-      await expect(block).to.be.rejectedWith('random')
-    })
-  })
 })
