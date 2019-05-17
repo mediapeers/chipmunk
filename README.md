@@ -17,11 +17,11 @@
 * no cookie management
 * optional ruby on rails object formatting, or implicitly via a flag in specifications indicating a specific action supports rails nested attributes
 * manual association resolving
+* return reduced result set based on given attributes
+* _viscacha_-like association resolve functionality
 
 ### TODO
 
-* return reduced result set based on given attributes
-* _viscacha_-like association resolve functionality
 * caching
 
 ### interface
@@ -66,7 +66,6 @@ await ch.action('um.user', 'get', { params: { user_id: 3 } })
 
 ```javascript
 // get user with associations resolved & limited attribute set
-// TODO!
 await ch.action('um.user', 'get', {
   params: { user_id: 3 },
   schema: `
@@ -125,7 +124,6 @@ users = ch.assign(users, orgResult.objects, 'organization')
 users[0].organization // => returns org of first user
 
 // alternatively..
-// TODO!
 users = await ch.fetchAndAssign(users, 'organization')
 users[0].organization // => returns org of first user
 ```
