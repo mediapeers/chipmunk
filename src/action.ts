@@ -1,11 +1,13 @@
 import UriTemplate from 'uri-templates'
-import {each, filter, get, merge, first, map, isArray, isEmpty, isPlainObject} from 'lodash'
+import {each, pick, pickBy, keys, filter, get, merge, first, map, isArray, isEmpty, isPlainObject} from 'lodash'
 import {stringify} from 'querystringify'
 
 import {IConfig} from './config'
 import {request, run} from './request'
 import getContext, {IAction} from './context'
 import format from './format'
+import parseSchema from './schema'
+import {fetch, assign} from './association'
 
 export class NotLoadedError extends Error {}
 
@@ -61,6 +63,34 @@ const validateParams = (action: IAction, params, config): boolean => {
   }
 
   return true
+}
+
+const resolve = async (objects, schema, config) => {
+  merge(schema, {
+    '@context': true,
+    '@id': true,
+    '@type': true,
+    '@associations': true,
+  })
+
+  const associations = pickBy(schema, isPlainObject)
+
+  const promises = map(associations, async (assocSchema, assocName) => {
+    try {
+      const result = await fetch(objects, assocName, config)
+      const resolved = await resolve(result.objects, assocSchema, config)
+      return assign(objects, resolved, assocName, config)
+    }
+    catch {
+      // if we fail to resolve an association, continue anyways
+      console.warn(`failed to resolve association ${assocName}`)
+      return objects
+    }
+  })
+
+  await Promise.all(promises)
+
+  return map(objects, (o) => pick(o, keys(schema)))
 }
 
 export const associationNotLoaded = (name) => {
@@ -121,6 +151,11 @@ export default async (appModel: string, actionName: string, opts: IActionOpts, c
       })
     })
   })
+
+  if (!isEmpty(opts.schema)) {
+    const schema = parseSchema(opts.schema)
+    objects = await resolve(objects, schema, config)
+  }
 
   const result: IResult = {
     objects,

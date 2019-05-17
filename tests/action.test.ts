@@ -110,5 +110,94 @@ describe('action', () => {
       const promise = chipmunk.action('um.user', 'query', { headers: { 'Session-Id': null } })
 			await expect(promise).to.be.rejected
     })
+
+    it('resolves schema', async () => {
+      nock(config.endpoints.um)
+        .get(matches('/users'))
+        .reply(200, {
+          members: [
+            {
+              '@type': 'user',
+              '@context': 'https://um.api.mediapeers.mobi/v20140601/context/user',
+              '@id': 'https://um.api.mediapeers.mobi/v20140601/user/1',
+              organization: {
+                '@id': 'https://um.api.mediapeers.mobi/v20140601/organization/3',
+              },
+              id: 1,
+              first_name: 'philipp',
+              last_name: 'goetzinger',
+              gender: 'male'
+            },
+            {
+              '@type': 'user',
+              '@context': 'https://um.api.mediapeers.mobi/v20140601/context/user',
+              '@id': 'https://um.api.mediapeers.mobi/v20140601/user/2',
+              organization: {
+                '@id': 'https://um.api.mediapeers.mobi/v20140601/organization/3',
+              },
+              id: 2,
+              first_name: 'antonie',
+              gender: 'female'
+            },
+          ]
+        })
+
+        .get(matches('/organizations/3'))
+        .reply(200, {
+          members: [
+            {
+              '@type': 'organization',
+              '@context': 'https://um.api.mediapeers.mobi/v20140601/context/organization',
+              '@id': 'https://um.api.mediapeers.mobi/v20140601/organization/3',
+              id: 3,
+              name: 'graefschaft',
+            },
+          ]
+        })
+
+      const expected = [
+        {
+          '@type': 'user',
+          '@context': 'https://um.api.mediapeers.mobi/v20140601/context/user',
+          '@id': 'https://um.api.mediapeers.mobi/v20140601/user/1',
+          '@associations': {
+            organization: 'https://um.api.mediapeers.mobi/v20140601/organization/3',
+          },
+          first_name: 'philipp',
+          last_name: 'goetzinger',
+          organization: {
+            '@type': 'organization',
+            '@context': 'https://um.api.mediapeers.mobi/v20140601/context/organization',
+            '@id': 'https://um.api.mediapeers.mobi/v20140601/organization/3',
+            '@associations': {},
+            name: 'graefschaft',
+          },
+        },
+        {
+          '@type': 'user',
+          '@context': 'https://um.api.mediapeers.mobi/v20140601/context/user',
+          '@id': 'https://um.api.mediapeers.mobi/v20140601/user/2',
+          '@associations': {
+            organization: 'https://um.api.mediapeers.mobi/v20140601/organization/3',
+          },
+          first_name: 'antonie',
+          organization: {
+            '@type': 'organization',
+            '@context': 'https://um.api.mediapeers.mobi/v20140601/context/organization',
+            '@id': 'https://um.api.mediapeers.mobi/v20140601/organization/3',
+            '@associations': {},
+            name: 'graefschaft',
+          },
+        },
+      ]
+
+      await chipmunk.run(async (ch) => {
+        const result = await ch.action('um.user', 'query', {
+          schema: 'first_name, last_name, organization { name }'
+        })
+
+        expect(result.objects).to.eql(expected)
+      })
+    })
   })
 })
