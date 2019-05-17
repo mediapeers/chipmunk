@@ -6,6 +6,8 @@
 
 * slim & simple compared to _chinchilla_
 * better suited for react apps
+* functional with hopefully no memory leaks
+* tested
 
 ### DONE
 
@@ -14,16 +16,39 @@
 * proper error handling instead of non-resolving promises
 * no cookie management
 * optional ruby on rails object formatting, or implicitly via a flag in specifications indicating a specific action supports rails nested attributes
+* manual association resolving
 
 ### TODO
 
-* tested
 * return reduced result set based on given attributes
 * _viscacha_-like association resolve functionality
-* manual association resolving
-* functional
+* caching
 
 ### interface
+
+#### setup, run blocks (always use run blocks!)
+
+```javascript
+const chipmunk = createChipmunk({
+  errorInterceptor: (err) => true,
+  headers: { 'Affiliation-Id': 'mpx' }
+})
+
+chipmunk.run(async (ch) => {
+  // to change config
+  ch.updateConfig({ headers: { 'Session-Id': '345dfgsdfgw43..' } })
+
+  // requests.. e.g.
+  await ch.context('um.user')
+
+  // an error happens
+  throw new Error('foo')
+}, (err) => {
+  // error handler is optional
+  console.log(err.message) // would print 'foo'
+})
+
+```
 
 #### contexts
 
@@ -35,23 +60,14 @@ await ch.context('um.user')
 #### actions
 
 ```javascript
-// interface
-ch.req = (
-  appAndModel: string,
-  params: { [s: string]: any },
-  options: { [s: string]: any }
-) => Promise<ChipmunkResult>
-```
-
-```javascript
 // get user, default method
-await ch.req('um.user', 'get', { ...options, params: { user_id: 3 } })
+await ch.action('um.user', 'get', { params: { user_id: 3 } })
 ```
 
 ```javascript
 // get user with associations resolved & limited attribute set
-await ch.req('um.user', 'get', {
-  ...options,
+// TODO!
+await ch.action('um.user', 'get', {
   params: { user_id: 3 },
   schema: `
     id, first_name,
@@ -62,7 +78,7 @@ await ch.req('um.user', 'get', {
 
 ```javascript
 // create new user
-await ch.req('um.user', 'create', {
+await ch.action('um.user', 'create', {
   body: {
     first_name: 'john',
     last_name: 'doe',
@@ -73,7 +89,7 @@ await ch.req('um.user', 'create', {
 
 ```javascript
 // update existing user
-await ch.req('um.user', 'update', {
+await ch.action('um.user', 'update', {
   params: { user_id: 3 },
   body: {
     first_name: 'johnny',
@@ -81,7 +97,7 @@ await ch.req('um.user', 'update', {
 })
 
 // update existing users
-await ch.req('um.user', 'update', {
+await ch.action('um.user', 'update', {
   body: {
     '3': {
       first_name: 'johnny',
@@ -101,14 +117,15 @@ to manually resolve associations:
 // fetch organizations for given users
 let users = [user1, user2, user3] // ..requested earlier
 
-user1['@organization'] // => { @id: 'https://url.to/organization/2' }
+user1['@associations']['organization'] // => https://url.to/organization/2'
 user1.organization // => NotLoadedError!
 
 const orgResult = await ch.fetch(users, 'organization') // => returns all associated organizations as ChipmunkResult
-users = ch.assign(users, orgResult.objects)
+users = ch.assign(users, orgResult.objects, 'organization')
 users[0].organization // => returns org of first user
 
 // alternatively..
+// TODO!
 users = await ch.fetchAndAssign(users, 'organization')
 users[0].organization // => returns org of first user
 ```
