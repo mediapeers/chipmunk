@@ -1,6 +1,6 @@
 import context, {IContext} from './context'
 import action, {IResult, IActionOpts} from './action'
-import {fetch} from './association'
+import {fetch, assign} from './association'
 import createConfig, {IConfig} from './config'
 
 export interface IInterface {
@@ -8,6 +8,7 @@ export interface IInterface {
   context: (urlOrAppModel: string) => Promise<IContext>
   action: (appModel: string, actionName: string, opts?: IActionOpts) => Promise<IResult>
   fetch: (objects: any[], name: string) => Promise<IResult>
+  assign: (targets: any[], objects: any[], name: string) => void
 }
 
 export interface IChipmunk extends IInterface {
@@ -23,6 +24,7 @@ export default (...overrides: Partial<IConfig>[]): IChipmunk => {
     context: (urlOrAppModel) => context(urlOrAppModel, config),
     action: (appModel, actionName, opts = {}) => action(appModel, actionName, opts, config),
     fetch: (objects, name) => fetch(objects, name, config),
+    assign: (targets, objects, name) => assign(targets, objects, name, config)
   }
 
   const updateConfig = (overrides) => {

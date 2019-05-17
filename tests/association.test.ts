@@ -1,9 +1,11 @@
 import 'mocha'
 import {expect} from 'chai'
+import {get} from 'lodash'
 import nock from 'nock'
 
 import createChipmunk from '../src'
 import {extractProps} from '../src/association'
+import {associationNotLoaded} from '../src/action'
 import {setup, matches} from './setup'
 
 const config = setup()
@@ -147,6 +149,128 @@ describe('association', () => {
         const result = await chipmunk.fetch(users, 'geo_scopes')
         expect(result.objects.length).to.be.gt(1)
       })
+    })
+  })
+
+  describe('assign', () => {
+    it('assigns belongs to associations', () => {
+      const targets = [
+        {
+          '@type': 'user',
+          '@associations': { },
+          get organization() { return associationNotLoaded('organization')() },
+        },
+        {
+          '@type': 'user',
+          '@associations': {
+            organization: 'https://um.api.mediapeers.mobi/v20140601/organization/105',
+          },
+          get organization() { return associationNotLoaded('organization')() },
+        },
+      ]
+
+      const objects = [
+        {
+          '@type': 'organization',
+          '@id': 'https://um.api.mediapeers.mobi/v20140601/organization/105',
+        },
+        {
+          '@type': 'organization',
+          '@id': 'https://um.api.mediapeers.mobi/v20140601/organization/106',
+        },
+      ]
+
+      chipmunk.assign(targets, objects, 'organization')
+      expect(targets[0]['organization']).to.be.null // could not be found
+      expect(targets[1]['organization']).to.exist
+    })
+
+    it('assigns HABTM associations', () => {
+      const targets = [
+        {
+          '@type': 'user',
+          '@associations': {
+            geo_scopes: [
+              'https://um.api.mediapeers.mobi/v20140601/geo_scope/UGA',
+              'https://um.api.mediapeers.mobi/v20140601/geo_scope/SWZ',
+            ],
+          },
+          get geo_scopes() { return associationNotLoaded('geo_scopes')() },
+        },
+        {
+          '@type': 'user',
+          '@associations': {
+            organization: 'https://um.api.mediapeers.mobi/v20140601/organization/105',
+            geo_scopes: [
+              'https://um.api.mediapeers.mobi/v20140601/geo_scope/XEU',
+              'https://um.api.mediapeers.mobi/v20140601/geo_scope/UGA',
+            ],
+          },
+          get geo_scopes() { return associationNotLoaded('geo_scopes')() },
+        },
+      ]
+
+      const objects = [
+        {
+          '@type': 'geo_scope',
+          '@id': 'https://um.api.mediapeers.mobi/v20140601/geo_scope/SWZ',
+        },
+        {
+          '@type': 'geo_scope',
+          '@id': 'https://um.api.mediapeers.mobi/v20140601/geo_scope/UGA',
+        },
+        {
+          '@type': 'geo_scope',
+          '@id': 'https://um.api.mediapeers.mobi/v20140601/geo_scope/XEU',
+        },
+      ]
+
+      chipmunk.assign(targets, objects, 'geo_scopes')
+      expect(get(targets, `[0].geo_scopes[0]['@id']`)).to.equal('https://um.api.mediapeers.mobi/v20140601/geo_scope/UGA')
+      expect(get(targets, `[1].geo_scopes[0]['@id']`)).to.equal('https://um.api.mediapeers.mobi/v20140601/geo_scope/XEU')
+      expect(get(targets, `[1].geo_scopes[1]['@id']`)).to.equal('https://um.api.mediapeers.mobi/v20140601/geo_scope/UGA')
+    })
+
+    it('assigns has many associations', () => {
+      const targets = [
+        {
+          '@type': 'user',
+          '@id': 'https://um.api.mediapeers.mobi/v20140601/user/1660',
+          '@associations': {
+            phones: 'https://um.api.mediapeers.mobi/v20140601/users/1660/phones',
+          },
+          get phones() { return associationNotLoaded('phones')() },
+        },
+        {
+          '@type': 'user',
+          '@id': 'https://um.api.mediapeers.mobi/v20140601/user/1661',
+          '@associations': {
+            phones: 'https://um.api.mediapeers.mobi/v20140601/users/1661/phones',
+          },
+          get phones() { return associationNotLoaded('phones')() },
+        },
+      ]
+
+      const objects = [
+        {
+          '@type': 'phone',
+          '@id': 'https://um.api.mediapeers.mobi/v20140601/user/phone/4',
+          '@associations': {
+            user: 'https://um.api.mediapeers.mobi/v20140601/user/1660',
+          },
+        },
+        {
+          '@type': 'phone',
+          '@id': 'https://um.api.mediapeers.mobi/v20140601/user/phone/5',
+          '@associations': {
+            user: 'https://um.api.mediapeers.mobi/v20140601/user/1660',
+          },
+        },
+      ]
+
+      chipmunk.assign(targets, objects, 'phones')
+      expect(get(targets, '[0].phones.length')).to.equal(2)
+      expect(get(targets, '[1].phones')).to.be.null
     })
   })
 })

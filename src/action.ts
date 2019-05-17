@@ -63,7 +63,7 @@ const validateParams = (action: IAction, params, config): boolean => {
   return true
 }
 
-const associationNotLoaded = (name) => {
+export const associationNotLoaded = (name) => {
   return () => {
     const err = new NotLoadedError(`'${name}' association not loaded`)
     err.name = 'NotLoadedError'

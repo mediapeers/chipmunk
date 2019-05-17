@@ -50,3 +50,46 @@ export default (structure) => {
   structure = (structure || '').replace(/\n|\r/g, "") // removes newlines
   return detectProps(structure)
 }
+
+/*
+
+user
+  first_name, last_name,
+  organization
+    name
+    country
+      name
+
+  - get all users
+  - get all user's organizations
+  - get all organization's countries
+
+  1. get users
+  2. for all users, pick attributes
+  3. fetch all organizations for users
+  4. for all organizations, pick attributes
+  5. fetch countries for all organizations
+  6. for all countries, pick name
+
+  const result = chch.action...
+
+  const resolve = (objects, schema) => {
+    const associations = filter(schema, isObject)
+
+    promises = map(associations, async (assoc) => {
+      try {
+        const assocResult = await association(object, assoc.name)
+        const assocResolved = resolve(assocResult.objects, schema[assoc.name])
+        return assign(objects, assocResolved)
+      }
+      catch {
+        // if we fail to resolve an association, continue anyways
+        console.warn('...')
+        return objects
+      }
+    })
+
+    await Promise.all(promises)
+    const data = map(objects, pick(object, keys(schema))
+  }
+ */
