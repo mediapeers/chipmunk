@@ -34,10 +34,10 @@ const chipmunk = createChipmunk({
   headers: { 'Affiliation-Id': 'mpx' }
 })
 
-chipmunk.run(async (ch) => {
-  // to change config
-  ch.updateConfig({ headers: { 'Session-Id': '345dfgsdfgw43..' } })
+// to change config
+chipmunk.updateConfig({ headers: { 'Session-Id': '345dfgsdfgw43..' } })
 
+chipmunk.run(async (ch) => {
   // requests.. e.g.
   await ch.context('um.user')
 
@@ -97,14 +97,10 @@ await ch.action('um.user', 'update', {
 
 // update existing users
 await ch.action('um.user', 'update', {
-  body: {
-    '3': {
-      first_name: 'johnny',
-    },
-    '5': {
-      first_name: 'hermine',
-    },
-  }
+  body: [
+    { id: 3, first_name: 'johnny' },
+    { id: 5, first_name: 'hermine' },
+  ]
 })
 ```
 
