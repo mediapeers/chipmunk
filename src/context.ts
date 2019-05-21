@@ -1,6 +1,7 @@
-import {get, first, reduce, merge} from 'lodash'
+import {get, first, reduce, merge, cloneDeep} from 'lodash'
 import {IConfig} from './config'
 import {request, run} from './request'
+import {set as cacheSet, get as cacheGet} from './cache'
 
 const uriCheck = /https?:\/\//i
 
@@ -44,15 +45,28 @@ export default async (urlOrAppModel: string, config: IConfig):Promise<IContext> 
     url = `${config.endpoints[app]}/context/${model}`
   }
 
-  const req = request(config)
-    .get(url)
+  let context
 
-  if (config.timestamp) req.query({ t: config.timestamp })
+  if (config.cache.enabled && config.cache.default) {
+    const cached = cacheGet(url, { engine: config.cache.default }, config)
+    context = cloneDeep(cached) as IContext
+  }
 
-  const res = await run(req)
-  const context = get(res, `body['@context']`) as IContext
+  if (!context) {
+    const req = request(config)
+      .get(url)
+
+    if (config.timestamp) req.query({ t: config.timestamp })
+
+    const res = await run(req)
+    context = get(res, `body['@context']`) as IContext
+  }
 
   if (!context) throw new Error(`Failed to fetch context ${urlOrAppModel}`)
+
+  if (config.cache.enabled && config.cache.default) {
+    cacheSet(url, cloneDeep(context), { engine: config.cache.default }, config)
+  }
 
   context.action = (name: string):IAction => {
     let action

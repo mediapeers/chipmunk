@@ -1,9 +1,11 @@
 import 'mocha'
 import {expect} from 'chai'
 import {keys} from 'lodash'
+import nock from 'nock'
 
 import createChipmunk from '../src'
-import {setup} from './setup'
+import {setup, matches} from './setup'
+import userContext from './fixtures/user.context'
 
 const config = setup()
 let chipmunk
@@ -33,5 +35,18 @@ describe('context', () => {
       const promise = ch.context('um.foo')
       await expect(promise).to.be.rejectedWith('Not Found')
     })
+  })
+
+  it('makes the request to get a context only once, i.e. caches the result', async () => {
+    chipmunk.updateConfig({ cache: { enabled: true, default: 'runtime' } })
+    chipmunk.cache.clear()
+
+    nock(config.endpoints.um)
+      .get(matches('/context/dontgetmewrong'))
+      .once() // IMPORTANT!
+      .reply(200, userContext)
+
+    await chipmunk.context('um.dontgetmewrong')
+    await chipmunk.context('um.dontgetmewrong')
   })
 })
