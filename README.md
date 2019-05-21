@@ -129,7 +129,7 @@ by default, chipmunk prefixes all cache keys with
 - session-id only, if present
 - 'anonymous', if none of the above
 
-```
+```javascript
 // use 'runtime' cache
 ch.updateConfig({ cache: { enabled: true, engine: 'runtime' } })
 
