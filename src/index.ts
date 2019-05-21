@@ -1,19 +1,31 @@
+import {merge} from 'lodash'
+
 import context, {IContext} from './context'
 import action, {IResult, IActionOpts} from './action'
 import {fetch, assign} from './association'
 import createConfig, {IConfig} from './config'
-import {IStorage, createRuntimeStorage, createLocalStorage} from './storage'
+import {
+  ICallOpts, ISetOpts, IUpdateOpts,
+  get, set, remove, update, clear
+} from './cache'
+
+export interface ICache {
+  set(key: string, value: any, opts?: ISetOpts): void
+  get(key: string, opts?: ICallOpts): any
+  remove(key: string, opts?: ICallOpts): void
+  update(key: string, cb: (any) => any, opts?: IUpdateOpts): any
+  clear(opts?: ICallOpts): void
+}
 
 export interface IInterface {
-  config: IConfig
-  updateConfig: (overrides?: Partial<IConfig>) => IConfig
-  context: (urlOrAppModel: string) => Promise<IContext>
-  action: (appModel: string, actionName: string, opts?: IActionOpts) => Promise<IResult>
-  fetch: (objects: any[], name: string) => Promise<IResult>
-  assign: (targets: any[], objects: any[], name: string) => void
-  fetchAndAssign: (targets: any[], name: string) => Promise<void>
-  runtimeStorage: IStorage,
-  localStorage: IStorage,
+  currentConfig(): IConfig
+  updateConfig(overrides?: Partial<IConfig>): IConfig
+  context(urlOrAppModel: string): Promise<IContext>
+  action(appModel: string, actionName: string, opts?: IActionOpts): Promise<IResult>
+  fetch(objects: any[], name: string): Promise<IResult>
+  assign(targets: any[], objects: any[], name: string): void
+  fetchAndAssign(targets: any[], name: string): Promise<void>
+  cache: ICache
 }
 
 export interface IChipmunk extends IInterface {
@@ -22,11 +34,14 @@ export interface IChipmunk extends IInterface {
 
 export default (...overrides: Partial<IConfig>[]): IChipmunk => {
   let config = createConfig.apply(null, overrides)
-  const runtimeStorage = createRuntimeStorage(config)
-  const localStorage = createLocalStorage(config)
+
+  const callOpts = (opts) => merge({ engine: config.cache.default }, opts)
 
   const ch: IInterface = {
-    config,
+    currentConfig: () => config,
+    updateConfig: (overrides) => {
+      return config = createConfig(config, overrides)
+    },
     context: (urlOrAppModel) => context(urlOrAppModel, config),
     action: (appModel, actionName, opts = {}) => action(appModel, actionName, opts, config),
     fetch: (objects, name) => fetch(objects, name, config),
@@ -35,11 +50,13 @@ export default (...overrides: Partial<IConfig>[]): IChipmunk => {
       const result = await fetch(targets, name, config)
       assign(targets, result.objects, name, config)
     },
-    updateConfig: (overrides) => {
-      return config = createConfig(config, overrides)
+    cache: {
+      set: (key, value, opts) => set(key, value, callOpts(opts), config),
+      get: (key, opts) => get(key, callOpts(opts), config),
+      remove: (key, opts) => remove(key, callOpts(opts), config),
+      update: (key, cb, opts) => update(key, cb, callOpts(opts), config),
+      clear: (opts) => clear(callOpts(opts))
     },
-    runtimeStorage,
-    localStorage,
   }
 
   const run = async (block, errorHandler?) => {

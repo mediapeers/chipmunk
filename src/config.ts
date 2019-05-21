@@ -1,6 +1,5 @@
 import {merge, get} from 'lodash'
 import {IRequestError} from './request'
-import {IStorage} from './storage'
 
 export interface IHeaderSettings {
   'Session-Id'?: string
@@ -10,8 +9,8 @@ export interface IHeaderSettings {
 }
 
 export interface ICacheSettings {
-  enabled: boolean
-  default?: IStorage
+  enabled?: boolean
+  default?: 'runtime' | 'storage' | null
   prefix?: string
 }
 
@@ -19,7 +18,7 @@ export interface IConfig {
   endpoints: { [s: string]: string }
   headers: IHeaderSettings
   timestamp: number
-  errorInterceptor?: (err: IRequestError) => boolean
+  errorInterceptor?(err: IRequestError): boolean
   devMode: boolean
   cache: ICacheSettings
 }
@@ -32,6 +31,7 @@ const DEFAULTS:IConfig = {
   },
   devMode: false,
   cache: {
+    default: null,
     prefix: 'anonymous',
     enabled: false,
   }
