@@ -19,9 +19,6 @@
 * manual association resolving
 * return reduced result set based on given attributes
 * _viscacha_-like association resolve functionality
-
-### TODO
-
 * caching
 
 ### interface
