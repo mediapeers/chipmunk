@@ -38,18 +38,18 @@ describe('config', () => {
 
   describe('#cachePrefix', () => {
     it('uses affiliation and role as prefix', () => {
-      const conf = createConfig({ headers: { 'Affiliation-Id': 'mpx', 'Role-Id': 5, 'Session-Id': '24FA' } })
-      expect(conf.cachePrefix).to.equal('mpx-5')
+      const conf = createConfig({ cache: { enabled: true }, headers: { 'Affiliation-Id': 'mpx', 'Role-Id': 5, 'Session-Id': '24FA' } })
+      expect(conf.cache.prefix).to.equal('mpx-5')
     })
 
     it('uses the session id as prefix', () => {
-      const conf = createConfig({ headers: { 'Session-Id': '24FA' } })
-      expect(conf.cachePrefix).to.equal('24FA')
+      const conf = createConfig({ cache: { enabled: true }, headers: { 'Session-Id': '24FA' } })
+      expect(conf.cache.prefix).to.equal('24FA')
     })
 
     it('uses _anonymous_ as prefix', () => {
       const conf = createConfig()
-      expect(conf.cachePrefix).to.equal('anonymous')
+      expect(conf.cache.prefix).to.equal('anonymous')
     })
   })
 })

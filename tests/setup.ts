@@ -6,6 +6,7 @@ import nock from 'nock'
 import fs from 'fs'
 import yaml from 'js-yaml'
 import {execSync} from 'child_process'
+import sinon from 'sinon'
 
 import chipmunk, {IChipmunk} from '../src'
 
@@ -33,6 +34,10 @@ export const setup = (overrides?: Partial<IConfig>): IConfig => {
     nock.cleanAll()
     mockContexts(conf)
     chai.use(chaiAsPromised)
+  })
+
+  afterEach(() => {
+    sinon.restore()
   })
 
   return conf
