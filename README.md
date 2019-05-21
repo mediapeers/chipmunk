@@ -123,3 +123,36 @@ users[0].organization // => returns org of first user
 users = await ch.fetchAndAssign(users, 'organization')
 users[0].organization // => returns org of first user
 ```
+
+#### cache
+
+by default, chipmunk prefixes all cache keys with
+- affiliation-id and role-id, if present
+- role-id only, if present
+- session-id only, if present
+- 'anonymous', if none of the above
+
+```
+// use 'runtime' cache
+ch.updateConfig({ cache: { enabled: true, engine: 'runtime' } })
+
+// use 'storage' cache
+ch.updateConfig({ cache: { enabled: true, engine: 'storage' } })
+
+// EXAMPLE 1, write to cache for current user role
+ch.updateConfig({ headers: { 'Role-Id': 5 }, cache: { enabled: true, engine: 'storage' } })
+ch.cache.set('foo', 'bar')
+ch.cache.get('foo') // => bar
+
+ch.updateConfig({ headers: { 'Role-Id': 8 } })
+ch.cache.get('foo') // => null
+
+// EXAMPLE 2, write to cache, ignoring session id, role or affiliation, using runtime cache
+ch.updateConfig({ headers: { 'Role-Id': 5 } })
+ch.cache.set('foo', 'bar', { noPrefix: true, engine: 'runtime' })
+ch.cache.get('foo', { noPrefix: true, engine: 'runtime' }) // => bar
+ch.cache.get('foo', { engine: 'runtime' }) // => null
+
+ch.updateConfig({ headers: { 'Role-Id': 8 } })
+ch.cache.get('foo', { noPrefix: true, engine: 'runtime' }) // => bar
+```
