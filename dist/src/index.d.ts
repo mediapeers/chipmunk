@@ -21,7 +21,7 @@ export interface IInterface {
     cache: ICache;
 }
 export interface IChipmunk extends IInterface {
-    run: (ch: IChipmunk, errorHandler?: Function) => Promise<any>;
+    run: (block: (ch: IInterface) => Promise<any>, errorHandler?: Function) => Promise<any>;
 }
 declare const _default: (...overrides: Partial<IConfig>[]) => IChipmunk;
 export default _default;
