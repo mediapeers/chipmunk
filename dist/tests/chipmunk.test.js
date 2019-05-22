@@ -53,6 +53,12 @@ describe('chipmunk.run', () => {
             }), handler);
             chai_1.expect(handler.called).to.be.true;
         }));
+        it('returns the result of the run block', () => __awaiter(this, void 0, void 0, function* () {
+            const returnValue = yield chipmunk.run((ch) => __awaiter(this, void 0, void 0, function* () {
+                return 'yay';
+            }));
+            chai_1.expect(returnValue).to.equal('yay');
+        }));
     });
     describe('#performLater', () => {
         it('calls perform later handlers after requests have been made', () => __awaiter(this, void 0, void 0, function* () {

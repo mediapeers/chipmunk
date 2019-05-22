@@ -70,7 +70,7 @@ exports.default = (...overrides) => {
     };
     const run = (block, errorHandler) => __awaiter(this, void 0, void 0, function* () {
         try {
-            yield block(ch);
+            return yield block(ch);
         }
         catch (e) {
             if (config.errorInterceptor) {
