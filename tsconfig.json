@@ -5,21 +5,21 @@
     "module": "commonjs",
     "moduleResolution": "node",
     "emitDecoratorMetadata": true,
+    "skipLibCheck": true,
     "experimentalDecorators": true,
     "declaration": true,
     "noImplicitAny": false,
     "noImplicitReturns": false,
     "removeComments": true,
     "strictNullChecks": false,
-    "outDir": "build",
+    "outDir": "dist",
     "lib": ["es6", "es7", "dom"],
-    "baseUrl": "src",
     "esModuleInterop": true,
-    "resolveJsonModule": true
   },
   "compilerOptsRef": {
+    "baseUrl": "src",
     "noUnusedLocals": true,
     "noUnusedParameters": true
   },
-  "exclude": ["build", "node_modules"]
+  "exclude": ["dist", "node_modules"]
 }

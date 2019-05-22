@@ -2,7 +2,8 @@
   "name": "chipmunk",
   "version": "0.0.1",
   "description": "helper library to talk to mediastore backends",
-  "main": "build/src/index.js",
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
   "scripts": {
     "postinstall": "rm -rf node_modules/chipmunk && ln -s ../src node_modules/chipmunk",
     "test": "mocha -r ts-node/register tests/**/*.test.ts --timeout 5000",
