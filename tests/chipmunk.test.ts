@@ -59,6 +59,14 @@ describe('chipmunk.run', () => {
 
       expect(handler.called).to.be.true
     })
+
+    it('returns the result of the run block', async () => {
+      const returnValue = await chipmunk.run(async (ch) => {
+        return 'yay'
+      })
+
+      expect(returnValue).to.equal('yay')
+    })
   })
 
   describe('#performLater', () => {
