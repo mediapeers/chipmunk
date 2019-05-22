@@ -199,5 +199,9 @@ describe('action', () => {
         expect(result.objects).to.eql(expected)
       })
     })
+
+    it('returns raw data, without association conversions', () => {
+      expect(true).to.be.false
+    })
   })
 })

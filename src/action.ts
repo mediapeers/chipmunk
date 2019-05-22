@@ -14,6 +14,7 @@ export class NotLoadedError extends Error {}
 export interface IActionOpts {
   ROR?: boolean
   withoutSession?: boolean
+  rawResult?: boolean
   headers?: { [s: string]: any }
   body?: { [s: string]: any }
   params?: { [s: string]: any }
@@ -34,6 +35,7 @@ export interface IResult {
 
 const DEFAULT_OPTS: IActionOpts = {
   ROR: false,
+  rawResult: false,
   params: {},
 }
 
@@ -137,20 +139,22 @@ export default async (appModel: string, actionName: string, opts: IActionOpts, c
   if (get(response, 'body.members')) objects = response.body.members
   else if (!isEmpty(response.body))  objects = [response.body]
 
-  each(objects, (object) => {
-    object['@associations'] = {}
+  if (!opts.rawResult) {
+    each(objects, (object) => {
+      object['@associations'] = {}
 
-    each(context.associations, (_def, name) => {
-      const data = object[name]
-      if (object[name]) {
-        object['@associations'][name] = isArray(data) ? map(data, '@id') : get(data, '@id')
-      }
+      each(context.associations, (_def, name) => {
+        const data = object[name]
+        if (object[name]) {
+          object['@associations'][name] = isArray(data) ? map(data, '@id') : get(data, '@id')
+        }
 
-      Object.defineProperty(object, name, {
-        get: () => associationNotLoaded(name)()
+        Object.defineProperty(object, name, {
+          get: () => associationNotLoaded(name)()
+        })
       })
     })
-  })
+  }
 
   if (!isEmpty(opts.schema)) {
     const schema = parseSchema(opts.schema)
