@@ -31,7 +31,7 @@ export interface IInterface {
 }
 
 export interface IChipmunk extends IInterface {
-  run: (ch: IChipmunk, errorHandler?: Function) => Promise<any>
+  run: (block: (ch: IInterface) => Promise<any>, errorHandler?: Function) => Promise<any>
 }
 
 const scope = (config): IInterface => {
