@@ -182,6 +182,9 @@ describe('action', () => {
                 chai_1.expect(result.objects).to.eql(expected);
             }));
         }));
+        it('returns raw data, without association conversions', () => {
+            chai_1.expect(true).to.be.false;
+        });
     });
 });
 //# sourceMappingURL=action.test.js.map
