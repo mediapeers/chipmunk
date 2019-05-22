@@ -200,8 +200,17 @@ describe('action', () => {
       })
     })
 
-    it('returns raw data, without association conversions', () => {
-      expect(true).to.be.false
+    it('returns raw results', async () => {
+      nock(config.endpoints.um)
+        .get(matches('/users'))
+        .reply(200, { members: [ { id: 'first', organization: { name: 'nested' } }, { id: 'second' } ]})
+
+      const expected = { id: 'first', organization: { name: 'nested' } }
+
+      await chipmunk.run(async (ch) => {
+        const result = await ch.action('um.user', 'query', { raw: true })
+        expect(result.objects[0]).to.eql(expected)
+      })
     })
   })
 })
