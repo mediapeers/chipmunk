@@ -13,8 +13,7 @@ export class NotLoadedError extends Error {}
 
 export interface IActionOpts {
   ROR?: boolean
-  withoutSession?: boolean
-  rawResult?: boolean
+  raw?: boolean
   headers?: { [s: string]: any }
   body?: { [s: string]: any }
   params?: { [s: string]: any }
@@ -35,7 +34,7 @@ export interface IResult {
 
 const DEFAULT_OPTS: IActionOpts = {
   ROR: false,
-  rawResult: false,
+  raw: false,
   params: {},
 }
 
@@ -139,7 +138,7 @@ export default async (appModel: string, actionName: string, opts: IActionOpts, c
   if (get(response, 'body.members')) objects = response.body.members
   else if (!isEmpty(response.body))  objects = [response.body]
 
-  if (!opts.rawResult) {
+  if (!opts.raw) {
     each(objects, (object) => {
       object['@associations'] = {}
 
@@ -156,7 +155,7 @@ export default async (appModel: string, actionName: string, opts: IActionOpts, c
     })
   }
 
-  if (!isEmpty(opts.schema)) {
+  if (!(opts.raw) && !isEmpty(opts.schema)) {
     const schema = parseSchema(opts.schema)
     objects = await resolve(objects, schema, config)
   }
