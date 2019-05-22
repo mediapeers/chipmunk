@@ -153,3 +153,24 @@ ch.cache.get('foo', { engine: 'runtime' }) // => null
 ch.updateConfig({ headers: { 'Role-Id': 8 } })
 ch.cache.get('foo', { noPrefix: true, engine: 'runtime' }) // => bar
 ```
+
+#### 'perform later' jobs
+
+chipmunk (as chinchilla did previously) offers convenience functionality to second level priority code after the important stuff has been processed.
+this allows for example to lazy load less important data after all important stuff has been handled.
+
+an example:
+
+```javascript
+const notImportant = () => {
+  console.log('this really was not that important')
+}
+
+ch.performLater(notImportant)
+
+const users = (await ch.action('um.user', 'query')).objects
+console.log(users)
+
+// => [user1, user2, ...]
+// => this really was not that important
+```

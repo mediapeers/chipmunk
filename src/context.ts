@@ -2,6 +2,7 @@ import {get, first, reduce, merge, cloneDeep} from 'lodash'
 import {IConfig} from './config'
 import {request, run} from './request'
 import {set as cacheSet, get as cacheGet} from './cache'
+import {pending} from './watcher'
 
 const uriCheck = /https?:\/\//i
 
@@ -49,16 +50,24 @@ export default async (urlOrAppModel: string, config: IConfig):Promise<IContext> 
 
   if (config.cache.enabled && config.cache.default) {
     const cached = cacheGet(url, { engine: config.cache.default }, config)
-    context = cloneDeep(cached) as IContext
+    if (cached) context = cloneDeep(cached) as IContext
   }
 
   if (!context) {
-    const req = request(config)
-      .get(url)
+    let res
 
-    if (config.timestamp) req.query({ t: config.timestamp })
+    if (pending(url, config)) {
+      res = await pending(url, config)
+    }
+    else {
+      const req = request(config)
+        .get(url)
 
-    const res = await run(req)
+      if (config.timestamp) req.query({ t: config.timestamp })
+
+      res = await run(url, req, config)
+    }
+
     context = get(res, `body['@context']`) as IContext
   }
 

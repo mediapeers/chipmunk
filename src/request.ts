@@ -1,8 +1,9 @@
 import superagent, {Request, Response, SuperAgentStatic, SuperAgentRequest} from 'superagent'
 import superdebug from 'superdebug'
-import {get, each, merge, isPlainObject} from 'lodash'
+import {get, each, merge, isEmpty, isPlainObject} from 'lodash'
 import {stringify} from 'querystringify'
 import {IConfig} from './config'
+import {enqueueRequest, clearRequest} from './watcher'
 
 export interface IRequestError extends Error {
   message: string
@@ -34,9 +35,12 @@ export const request = (config: IConfig, headers?: { [s: string]: any }): SuperA
   return req
 }
 
-export const run = async (req: SuperAgentRequest):Promise<Response>  => {
+export const run = async (key: string, req: SuperAgentRequest, config: IConfig):Promise<Response>  => {
   try {
-    return await req
+    const promise = req
+    enqueueRequest(key, promise, config)
+
+    return await promise
   }
   catch (err) {
     const error = err as IRequestError
@@ -45,5 +49,8 @@ export const run = async (req: SuperAgentRequest):Promise<Response>  => {
     error.text   = get(err, 'response.body.description') || err.message
 
     throw error
+  }
+  finally {
+    clearRequest(key, config)
   }
 }

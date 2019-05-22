@@ -131,7 +131,7 @@ export default async (appModel: string, actionName: string, opts: IActionOpts, c
 
   if (config.timestamp) req.query({ t: config.timestamp })
 
-  const response = await run(req)
+  const response = await run(uri, req, config)
   let objects = []
 
   if (get(response, 'body.members')) objects = response.body.members

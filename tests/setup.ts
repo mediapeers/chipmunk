@@ -43,6 +43,12 @@ export const setup = (overrides?: Partial<IConfig>): IConfig => {
   return conf
 }
 
+export const nap = async (milliseconds: number = 100): Promise<void> => {
+  return new Promise((resolve) => {
+    setTimeout(resolve, milliseconds)
+  })
+}
+
 export const matches = (needle: string) => {
   return (uri) => uri.includes(needle)
 }

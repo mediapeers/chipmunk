@@ -49,4 +49,21 @@ describe('context', () => {
     await chipmunk.context('um.dontgetmewrong')
     await chipmunk.context('um.dontgetmewrong')
   })
+
+  it('runs only one of multiple parallel identical requests', async () => {
+    chipmunk.updateConfig({ cache: { enabled: true, default: 'runtime' } })
+    chipmunk.cache.clear()
+
+    nock(config.endpoints.um)
+      .get(matches('/context/dontgetmewrong'))
+      .once() // IMPORTANT!
+      .reply(200, userContext)
+
+    const promises = [
+      chipmunk.context('um.dontgetmewrong'),
+      chipmunk.context('um.dontgetmewrong'),
+    ]
+
+    await Promise.all(promises)
+  })
 })

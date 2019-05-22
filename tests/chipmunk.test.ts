@@ -5,7 +5,7 @@ import {get, merge} from 'lodash'
 import context from '../src/context'
 import createConfig from '../src/config'
 
-import {setup} from './setup'
+import {setup, nap} from './setup'
 import createChipmunk from '../src'
 
 const config = setup()
@@ -58,6 +58,24 @@ describe('chipmunk.run', () => {
       }, handler)
 
       expect(handler.called).to.be.true
+    })
+  })
+
+  describe('#performLater', () => {
+    it('calls perform later handlers after requests have been made', async () => {
+      const handler1 = sinon.fake()
+      const handler2 = sinon.fake()
+
+      chipmunk.performLater(handler1)
+      chipmunk.performLater(handler2)
+
+      await chipmunk.context('um.user')
+      await chipmunk.context('um.organization')
+
+      await nap(200)
+
+      expect(handler1.called).to.be.true
+      expect(handler2.called).to.be.true
     })
   })
 })

@@ -1,4 +1,4 @@
-import {merge, get} from 'lodash'
+import {merge, get, cloneDeep} from 'lodash'
 import {IRequestError} from './request'
 
 export interface IHeaderSettings {
@@ -14,13 +14,19 @@ export interface ICacheSettings {
   prefix?: string
 }
 
+export interface IWatcher {
+  pendingRequests: { [s: string]: any }
+  performLaterHandlers: Function[]
+}
+
 export interface IConfig {
   endpoints: { [s: string]: string }
   headers: IHeaderSettings
   timestamp: number
-  errorInterceptor?(err: IRequestError): boolean
+  errorInterceptor(err: IRequestError): boolean
   devMode: boolean
   cache: ICacheSettings
+  watcher: IWatcher
 }
 
 const DEFAULTS:IConfig = {
@@ -34,12 +40,18 @@ const DEFAULTS:IConfig = {
     default: null,
     prefix: 'anonymous',
     enabled: false,
-  }
+  },
+  watcher: {
+    pendingRequests: {},
+    performLaterHandlers: [],
+  },
+  errorInterceptor: null,
 }
 
 export default (...configs: Partial<IConfig>[]):IConfig => {
-  configs.unshift({}, DEFAULTS)
-  const result = merge.apply(null, configs)
+  const conf = cloneDeep(configs)
+  conf.unshift({}, DEFAULTS)
+  const result = merge.apply(null, conf)
 
   if (get(result, `headers['Affiliation-Id']`) && get(result, `headers['Role-Id']`)) {
     result.cache.prefix = `${result.headers['Affiliation-Id']}-${result.headers['Role-Id']}`
