@@ -182,9 +182,16 @@ describe('action', () => {
                 chai_1.expect(result.objects).to.eql(expected);
             }));
         }));
-        it('returns raw data, without association conversions', () => {
-            chai_1.expect(true).to.be.false;
-        });
+        it('returns raw results', () => __awaiter(this, void 0, void 0, function* () {
+            nock_1.default(config.endpoints.um)
+                .get(setup_1.matches('/users'))
+                .reply(200, { members: [{ id: 'first', organization: { name: 'nested' } }, { id: 'second' }] });
+            const expected = { id: 'first', organization: { name: 'nested' } };
+            yield chipmunk.run((ch) => __awaiter(this, void 0, void 0, function* () {
+                const result = yield ch.action('um.user', 'query', { raw: true });
+                chai_1.expect(result.objects[0]).to.eql(expected);
+            }));
+        }));
     });
 });
 //# sourceMappingURL=action.test.js.map

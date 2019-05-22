@@ -23,7 +23,7 @@ class NotLoadedError extends Error {
 exports.NotLoadedError = NotLoadedError;
 const DEFAULT_OPTS = {
     ROR: false,
-    rawResult: false,
+    raw: false,
     params: {},
 };
 const extractParamsFromBody = (action, body = {}) => {
@@ -106,7 +106,7 @@ exports.default = (appModel, actionName, opts, config) => __awaiter(this, void 0
         objects = response.body.members;
     else if (!lodash_1.isEmpty(response.body))
         objects = [response.body];
-    if (!opts.rawResult) {
+    if (!opts.raw) {
         lodash_1.each(objects, (object) => {
             object['@associations'] = {};
             lodash_1.each(context.associations, (_def, name) => {
@@ -120,7 +120,7 @@ exports.default = (appModel, actionName, opts, config) => __awaiter(this, void 0
             });
         });
     }
-    if (!lodash_1.isEmpty(opts.schema)) {
+    if (!(opts.raw) && !lodash_1.isEmpty(opts.schema)) {
         const schema = schema_1.default(opts.schema);
         objects = yield resolve(objects, schema, config);
     }
