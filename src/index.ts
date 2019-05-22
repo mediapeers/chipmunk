@@ -91,7 +91,7 @@ export default (...overrides: Partial<IConfig>[]): IChipmunk => {
 
   const run = async (block, errorHandler?) => {
     try {
-      await block(ch)
+      return await block(ch)
     }
     catch (e) {
       if (config.errorInterceptor) {
