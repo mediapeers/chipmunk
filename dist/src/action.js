@@ -128,7 +128,14 @@ exports.default = (appModel, actionName, opts, config) => __awaiter(this, void 0
         objects,
         get object() { return lodash_1.first(objects); },
         headers: lodash_1.get(response, 'headers', {}),
+        type: lodash_1.get(response, `body['@type']`),
     };
+    if (lodash_1.get(response, 'body.aggregations')) {
+        result.aggregations = lodash_1.reduce(response.body.aggregations, (acc, agg, name) => {
+            acc[name] = lodash_1.map(lodash_1.get(agg, 'buckets'), (tranche) => ({ value: tranche.key, count: tranche.doc_count }));
+            return acc;
+        }, {});
+    }
     return result;
 });
 //# sourceMappingURL=action.js.map

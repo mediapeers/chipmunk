@@ -24,6 +24,7 @@ export interface IObject {
 export interface IResult {
     object: IObject;
     objects: IObject[];
+    type?: string;
     headers?: {
         [s: string]: string;
     };

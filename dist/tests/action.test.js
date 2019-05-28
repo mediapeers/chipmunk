@@ -52,6 +52,31 @@ describe('action', () => {
                 chai_1.expect(result.object['@associations'].organization).to.eql('http://um.app/organization/1');
             }));
         }));
+        it(`returns reformatted aggregations`, () => __awaiter(this, void 0, void 0, function* () {
+            const scope = nock_1.default(config.endpoints.um)
+                .get(setup_1.matches('/users'))
+                .reply(200, {
+                members: [{ id: 'first' }],
+                aggregations: {
+                    count_by_gender: {
+                        buckets: [
+                            { key: 'male', doc_count: 13 },
+                            { key: 'female', doc_count: 21 },
+                        ]
+                    },
+                },
+            });
+            const expected = {
+                count_by_gender: [
+                    { value: 'male', count: 13 },
+                    { value: 'female', count: 21 },
+                ]
+            };
+            yield chipmunk.run((ch) => __awaiter(this, void 0, void 0, function* () {
+                const result = yield ch.action('um.user', 'query');
+                chai_1.expect(result.aggregations).to.eql(expected);
+            }));
+        }));
         it('sends uri params', () => __awaiter(this, void 0, void 0, function* () {
             nock_1.default(config.endpoints.um)
                 .get(setup_1.matches('users/1659'))
