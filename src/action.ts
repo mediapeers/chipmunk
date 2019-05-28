@@ -25,9 +25,16 @@ export interface IObject {
   [s: string]: any
 }
 
+export interface IPagination {
+  total_pages: number
+  total_count: number
+  current_page: number
+}
+
 export interface IResult {
   object: IObject
   objects: IObject[]
+  pagination?: IPagination
   type?: string
   headers?: { [s: string]: string }
   aggregations?: any
@@ -38,6 +45,8 @@ const DEFAULT_OPTS: IActionOpts = {
   raw: false,
   params: {},
 }
+
+const PAGINATION_PROPS = ['@total_pages', '@total_count', '@current_page']
 
 const extractParamsFromBody = (action: IAction, body = {}): {[s:string]:any} => {
   const result = {}
@@ -173,6 +182,16 @@ export default async (appModel: string, actionName: string, opts: IActionOpts, c
       acc[name] = map(get(agg, 'buckets'), (tranche) => ({ value: tranche.key, count: tranche.doc_count }))
       return acc
     }, {})
+  }
+
+  if (get(response, `body['@total_count']`)) {
+    result.pagination = {} as IPagination
+
+    each(PAGINATION_PROPS, (prop) => {
+      if (response.body[prop]) {
+        result.pagination[prop.substr(1)] = response.body[prop]
+      }
+    })
   }
 
   return result

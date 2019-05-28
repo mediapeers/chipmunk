@@ -49,6 +49,28 @@ describe('action', () => {
       })
     })
 
+    it(`returns pagination results`, async () => {
+      const scope = nock(config.endpoints.um)
+        .get(matches('/users'))
+        .reply(200, {
+          members: [ { id: 'first' } ],
+          '@total_pages': 3,
+          '@total_count': 14,
+          '@current_page': 1,
+        })
+
+      const expected = {
+        total_pages: 3,
+        total_count: 14,
+        current_page: 1,
+      }
+
+      await chipmunk.run(async (ch) => {
+        const result = await ch.action('um.user', 'query')
+        expect(result.pagination).to.eql(expected)
+      })
+    })
+
     it(`returns reformatted aggregations`, async () => {
       const scope = nock(config.endpoints.um)
         .get(matches('/users'))
