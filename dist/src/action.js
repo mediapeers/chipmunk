@@ -26,6 +26,7 @@ const DEFAULT_OPTS = {
     raw: false,
     params: {},
 };
+const PAGINATION_PROPS = ['@total_pages', '@total_count', '@current_page'];
 const extractParamsFromBody = (action, body = {}) => {
     const result = {};
     lodash_1.each(action.mappings || [], (mapping) => {
@@ -135,6 +136,14 @@ exports.default = (appModel, actionName, opts, config) => __awaiter(this, void 0
             acc[name] = lodash_1.map(lodash_1.get(agg, 'buckets'), (tranche) => ({ value: tranche.key, count: tranche.doc_count }));
             return acc;
         }, {});
+    }
+    if (lodash_1.get(response, `body['@total_count']`)) {
+        result.pagination = {};
+        lodash_1.each(PAGINATION_PROPS, (prop) => {
+            if (response.body[prop]) {
+                result.pagination[prop.substr(1)] = response.body[prop];
+            }
+        });
     }
     return result;
 });

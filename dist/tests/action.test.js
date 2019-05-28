@@ -52,6 +52,25 @@ describe('action', () => {
                 chai_1.expect(result.object['@associations'].organization).to.eql('http://um.app/organization/1');
             }));
         }));
+        it(`returns pagination results`, () => __awaiter(this, void 0, void 0, function* () {
+            const scope = nock_1.default(config.endpoints.um)
+                .get(setup_1.matches('/users'))
+                .reply(200, {
+                members: [{ id: 'first' }],
+                '@total_pages': 3,
+                '@total_count': 14,
+                '@current_page': 1,
+            });
+            const expected = {
+                total_pages: 3,
+                total_count: 14,
+                current_page: 1,
+            };
+            yield chipmunk.run((ch) => __awaiter(this, void 0, void 0, function* () {
+                const result = yield ch.action('um.user', 'query');
+                chai_1.expect(result.pagination).to.eql(expected);
+            }));
+        }));
         it(`returns reformatted aggregations`, () => __awaiter(this, void 0, void 0, function* () {
             const scope = nock_1.default(config.endpoints.um)
                 .get(setup_1.matches('/users'))

@@ -21,9 +21,15 @@ export interface IObject {
     };
     [s: string]: any;
 }
+export interface IPagination {
+    total_pages: number;
+    total_count: number;
+    current_page: number;
+}
 export interface IResult {
     object: IObject;
     objects: IObject[];
+    pagination?: IPagination;
     type?: string;
     headers?: {
         [s: string]: string;
