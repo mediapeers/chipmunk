@@ -49,6 +49,34 @@ describe('action', () => {
       })
     })
 
+    it(`returns reformatted aggregations`, async () => {
+      const scope = nock(config.endpoints.um)
+        .get(matches('/users'))
+        .reply(200, {
+          members: [ { id: 'first' } ],
+          aggregations: {
+            count_by_gender: {
+              buckets: [
+                { key: 'male', doc_count: 13 },
+                { key: 'female', doc_count: 21 },
+              ]
+            },
+          },
+        })
+
+      const expected = {
+        count_by_gender: [
+          { value: 'male', count: 13 },
+          { value: 'female', count: 21 },
+        ]
+      }
+
+      await chipmunk.run(async (ch) => {
+        const result = await ch.action('um.user', 'query')
+        expect(result.aggregations).to.eql(expected)
+      })
+    })
+
     it('sends uri params', async () => {
       nock(config.endpoints.um)
         .get(matches('users/1659'))

@@ -1,5 +1,5 @@
 import UriTemplate from 'uri-templates'
-import {each, pick, pickBy, keys, filter, get, merge, first, map, isArray, isEmpty, isPlainObject} from 'lodash'
+import {each, pick, pickBy, keys, reduce, filter, get, merge, first, map, isArray, isEmpty, isPlainObject} from 'lodash'
 import {stringify} from 'querystringify'
 
 import {IConfig} from './config'
@@ -28,6 +28,7 @@ export interface IObject {
 export interface IResult {
   object: IObject
   objects: IObject[]
+  type?: string
   headers?: { [s: string]: string }
   aggregations?: any
 }
@@ -164,6 +165,14 @@ export default async (appModel: string, actionName: string, opts: IActionOpts, c
     objects,
     get object() { return first(objects) },
     headers: get(response, 'headers', {}),
+    type: get(response, `body['@type']`),
+  }
+
+  if (get(response, 'body.aggregations')) {
+    result.aggregations = reduce(response.body.aggregations, (acc, agg, name) => {
+      acc[name] = map(get(agg, 'buckets'), (tranche) => ({ value: tranche.key, count: tranche.doc_count }))
+      return acc
+    }, {})
   }
 
   return result
