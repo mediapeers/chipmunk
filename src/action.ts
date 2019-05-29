@@ -12,8 +12,15 @@ import {fetch, assign} from './association'
 export class NotLoadedError extends Error {}
 
 export interface IActionOpts {
+  // converts to ruby on rails accepts nested attributes compatible body
   ROR?: boolean
+  // returns raw data, without moving association references, does not support schema resolving
   raw?: boolean
+  // if enabled, this request is routed via tuco
+  proxy?: boolean
+  // indicates, if provided array body should be converted into hash, where 'id' is the key of each
+  multi?: boolean
+
   headers?: { [s: string]: any }
   body?: { [s: string]: any }
   params?: { [s: string]: any }
@@ -43,6 +50,8 @@ export interface IResult {
 const DEFAULT_OPTS: IActionOpts = {
   ROR: false,
   raw: false,
+  proxy: false,
+  multi: false,
   params: {},
 }
 
@@ -118,7 +127,7 @@ export default async (appModel: string, actionName: string, opts: IActionOpts, c
 
   const context = await getContext(appModel, config)
   const action = context.action(actionName)
-  const body = format(opts.body, action.collection, opts.ROR)
+  const body = format(opts.body, opts.multi, opts.ROR)
   const uriTemplate = UriTemplate(action.template)
   const params = merge({}, extractParamsFromBody(action, body), opts.params)
 

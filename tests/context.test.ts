@@ -37,6 +37,14 @@ describe('context', () => {
     })
   })
 
+  it('makes the request to get a context for a sub-model', async () => {
+    nock(config.endpoints.pm)
+      .get(matches('/context/product/asset'))
+      .reply(200, { '@context': {} })
+
+    await chipmunk.context('pm.product/asset')
+  })
+
   it('makes the request to get a context only once, i.e. caches the result', async () => {
     chipmunk.updateConfig({ cache: { enabled: true, default: 'runtime' } })
     chipmunk.cache.clear()
