@@ -8,6 +8,7 @@ import getContext, {IAction} from './context'
 import format from './format'
 import parseSchema from './schema'
 import {fetch, assign} from './association'
+import log from './log'
 
 export class NotLoadedError extends Error {}
 
@@ -76,7 +77,7 @@ const validateParams = (action: IAction, params, config): boolean => {
     if (!params[variable]) {
       const msg = `Required param '${variable}' for '${action.template}' missing!`
       if (config.devMode) throw new Error(msg)
-      else console.log(msg)
+      else log(msg)
 
       return false
     }
@@ -101,9 +102,10 @@ const resolve = async (objects, schema, config) => {
       const resolved = await resolve(result.objects, assocSchema, config)
       return assign(objects, resolved, assocName, config)
     }
-    catch {
+    catch (err) {
       // if we fail to resolve an association, continue anyways
-      console.warn(`failed to resolve association ${assocName}`)
+      log(`failed to resolve association ${assocName}`)
+      if (config.devMode) log(err, objects, schema)
       return objects
     }
   })
