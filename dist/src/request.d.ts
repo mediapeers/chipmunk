@@ -5,6 +5,7 @@ export interface IRequestError extends Error {
     status?: number;
     text?: string;
     object?: any;
+    url?: string;
 }
 export declare const isNode: () => boolean;
 export declare const request: (config: IConfig, headers?: {

@@ -42,6 +42,7 @@ exports.run = (key, req, config) => __awaiter(this, void 0, void 0, function* ()
         error.name = 'RequestError';
         error.object = lodash_1.get(err, 'response.body');
         error.text = lodash_1.get(err, 'response.body.description') || err.message;
+        error.url = lodash_1.get(req, 'url');
         throw error;
     }
     finally {
