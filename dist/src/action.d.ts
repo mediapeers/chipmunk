@@ -4,6 +4,8 @@ export declare class NotLoadedError extends Error {
 export interface IActionOpts {
     ROR?: boolean;
     raw?: boolean;
+    proxy?: boolean;
+    multi?: boolean;
     headers?: {
         [s: string]: any;
     };

@@ -24,6 +24,8 @@ exports.NotLoadedError = NotLoadedError;
 const DEFAULT_OPTS = {
     ROR: false,
     raw: false,
+    proxy: false,
+    multi: false,
     params: {},
 };
 const PAGINATION_PROPS = ['@total_pages', '@total_count', '@current_page'];
@@ -83,7 +85,7 @@ exports.default = (appModel, actionName, opts, config) => __awaiter(this, void 0
     opts = lodash_1.merge({}, DEFAULT_OPTS, opts);
     const context = yield context_1.default(appModel, config);
     const action = context.action(actionName);
-    const body = format_1.default(opts.body, action.collection, opts.ROR);
+    const body = format_1.default(opts.body, opts.multi, opts.ROR);
     const uriTemplate = uri_templates_1.default(action.template);
     const params = lodash_1.merge({}, extractParamsFromBody(action, body), opts.params);
     validateParams(action, params, config);

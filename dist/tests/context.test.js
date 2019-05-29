@@ -42,6 +42,12 @@ describe('context', () => {
             yield chai_1.expect(promise).to.be.rejectedWith('Not Found');
         }));
     }));
+    it('makes the request to get a context for a sub-model', () => __awaiter(this, void 0, void 0, function* () {
+        nock_1.default(config.endpoints.pm)
+            .get(setup_1.matches('/context/product/asset'))
+            .reply(200, { '@context': {} });
+        yield chipmunk.context('pm.product/asset');
+    }));
     it('makes the request to get a context only once, i.e. caches the result', () => __awaiter(this, void 0, void 0, function* () {
         chipmunk.updateConfig({ cache: { enabled: true, default: 'runtime' } });
         chipmunk.cache.clear();
