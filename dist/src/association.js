@@ -94,6 +94,8 @@ exports.assign = (targets, objects, name, config) => {
             const target = targetsById[ref];
             if (!lodash_1.isEmpty(target)) {
                 const value = readProp(target, name);
+                if (value && !lodash_1.isArray(value))
+                    return;
                 if (value)
                     target[name].push(object);
                 else
