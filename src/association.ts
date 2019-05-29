@@ -112,6 +112,7 @@ export const assign = (targets: any[], objects: any[], name: string, config: ICo
       const target = targetsById[ref]
       if (!isEmpty(target)) {
         const value = readProp(target, name)
+        if (value && !isArray(value)) return // already has a value which is not an array, abort.
 
         if (value) target[name].push(object)
         else Object.defineProperty(target, name, { value: [object] })
