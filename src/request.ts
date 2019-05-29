@@ -10,6 +10,7 @@ export interface IRequestError extends Error {
   status?: number
   text?: string
   object?: any
+  url?: string
 }
 
 export const isNode = (): boolean => {
@@ -47,6 +48,7 @@ export const run = async (key: string, req: SuperAgentRequest, config: IConfig):
     error.name = 'RequestError'
     error.object = get(err, 'response.body')
     error.text   = get(err, 'response.body.description') || err.message
+    error.url    = get(req, 'url')
 
     throw error
   }
