@@ -18,6 +18,7 @@ const context_1 = __importDefault(require("./context"));
 const format_1 = __importDefault(require("./format"));
 const schema_1 = __importDefault(require("./schema"));
 const association_1 = require("./association");
+const log_1 = __importDefault(require("./log"));
 class NotLoadedError extends Error {
 }
 exports.NotLoadedError = NotLoadedError;
@@ -46,7 +47,7 @@ const validateParams = (action, params, config) => {
             if (config.devMode)
                 throw new Error(msg);
             else
-                console.log(msg);
+                log_1.default(msg);
             return false;
         }
     }
@@ -66,8 +67,10 @@ const resolve = (objects, schema, config) => __awaiter(this, void 0, void 0, fun
             const resolved = yield resolve(result.objects, assocSchema, config);
             return association_1.assign(objects, resolved, assocName, config);
         }
-        catch (_a) {
-            console.warn(`failed to resolve association ${assocName}`);
+        catch (err) {
+            log_1.default(`failed to resolve association ${assocName}`);
+            if (config.devMode)
+                log_1.default(err, objects, schema);
             return objects;
         }
     }));
