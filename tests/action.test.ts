@@ -17,7 +17,10 @@ describe('action', () => {
     it('queries for users', async () => {
       nock(config.endpoints.um)
         .get(matches('/users'))
-        .reply(200, { members: [ { id: 'first' }, { id: 'second' } ]})
+        .reply(200, { members: [
+          { '@context': 'https://um.api.mediapeers.mobi/v20140601/context/user', id: 'first' },
+          { '@context': 'https://um.api.mediapeers.mobi/v20140601/context/user', id: 'second' },
+        ]})
 
       await chipmunk.run(async (ch) => {
         const result = await ch.action('um.user', 'query')
@@ -28,7 +31,10 @@ describe('action', () => {
     it('throws if trying to access (not yet) resolved association data', async () => {
       const scope = nock(config.endpoints.um)
         .get(matches('/users'))
-        .reply(200, { members: [ { id: 'first' }, { id: 'second' } ]})
+        .reply(200, { members: [
+          { '@context': 'https://um.api.mediapeers.mobi/v20140601/context/user', id: 'first' },
+          { '@context': 'https://um.api.mediapeers.mobi/v20140601/context/user', id: 'second' },
+        ]})
 
       await chipmunk.run(async (ch) => {
         const result = await ch.action('um.user', 'query')
@@ -41,7 +47,17 @@ describe('action', () => {
     it(`moves association reference into '@associations'`, async () => {
       const scope = nock(config.endpoints.um)
         .get(matches('/users'))
-        .reply(200, { members: [ { id: 'first', organization: { '@id': 'http://um.app/organization/1' } }, { id: 'second' } ]})
+        .reply(200, { members: [
+          {
+            '@context': 'https://um.api.mediapeers.mobi/v20140601/context/user',
+            id: 'first',
+            organization: { '@id': 'http://um.app/organization/1' },
+          },
+          {
+            '@context': 'https://um.api.mediapeers.mobi/v20140601/context/user',
+            id: 'second',
+          },
+        ]})
 
       await chipmunk.run(async (ch) => {
         const result = await ch.action('um.user', 'query')
@@ -49,11 +65,47 @@ describe('action', () => {
       })
     })
 
+    // this is required because subclasses can have associations defined the super class has not
+    // in this example the manager context has a 'geo_scopes' association, which the base user context is lacking
+    it(`moves subclass specific association references`, async () => {
+      const scope = nock(config.endpoints.um)
+        .get(matches('/users'))
+        .reply(200, {
+          members: [
+            {
+              '@context': 'https://um.api.mediapeers.mobi/v20140601/context/user/manager',
+              id: 'first',
+              organization: { '@id': 'http://um.app/organizations/1' },
+              geo_scopes: [
+                { '@id': 'https://um.api.mediapeers.mobi/v20140601/geo_scope/UGA' },
+                { '@id': 'https://um.api.mediapeers.mobi/v20140601/geo_scope/SWZ' },
+              ],
+            },
+            {
+              '@context': 'https://um.api.mediapeers.mobi/v20140601/context/user',
+              id: 'second',
+              organization: { '@id': 'http://um.app/organizations/1' },
+            }
+          ]
+        })
+
+      await chipmunk.run(async (ch) => {
+        const result = await ch.action('um.user', 'query')
+        expect(result.objects[0]['@associations'].organization).to.equal('http://um.app/organizations/1')
+        expect(result.objects[0]['@associations'].geo_scopes).to.eql([
+          'https://um.api.mediapeers.mobi/v20140601/geo_scope/UGA',
+          'https://um.api.mediapeers.mobi/v20140601/geo_scope/SWZ',
+        ])
+
+        expect(result.objects[1]['@associations'].organization).to.equal('http://um.app/organizations/1')
+      })
+    })
+
     it(`returns pagination results`, async () => {
       const scope = nock(config.endpoints.um)
         .get(matches('/users'))
         .reply(200, {
-          members: [ { id: 'first' } ],
+          members: [ { '@context': 'https://um.api.mediapeers.mobi/v20140601/context/user', id: 'first' } ],
           '@total_pages': 3,
           '@total_count': 14,
           '@current_page': 1,
@@ -75,7 +127,7 @@ describe('action', () => {
       const scope = nock(config.endpoints.um)
         .get(matches('/users'))
         .reply(200, {
-          members: [ { id: 'first' } ],
+          members: [ { '@context': 'https://um.api.mediapeers.mobi/v20140601/context/user', id: 'first' } ],
           aggregations: {
             count_by_gender: {
               buckets: [
@@ -102,7 +154,7 @@ describe('action', () => {
     it('sends uri params', async () => {
       nock(config.endpoints.um)
         .get(matches('users/1659'))
-        .reply(200, { id: 'one' })
+        .reply(200, { '@context': 'https://um.api.mediapeers.mobi/v20140601/context/user', id: 'one' })
 
       await chipmunk.run(async (ch) => {
         const result = await ch.action('um.user', 'get', { params: { user_ids: 1659 } })

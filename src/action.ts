@@ -160,10 +160,14 @@ export default async (appModel: string, actionName: string, opts: IActionOpts, c
   else if (!isEmpty(response.body))  objects = [response.body]
 
   if (!opts.raw) {
-    each(objects, (object) => {
+    // objects can have different context, e.g. series vs seasons vs episodes
+    // for this reason we have to check all possible contexts for association definitions
+
+    const promises = map(objects, async (object) => {
+      const objectContext = await getContext(object['@context'], config)
       object['@associations'] = {}
 
-      each(context.associations, (_def, name) => {
+      each(objectContext.associations, (_def, name) => {
         const data = object[name]
         if (object[name]) {
           object['@associations'][name] = isArray(data) ? map(data, '@id') : get(data, '@id')
@@ -174,6 +178,8 @@ export default async (appModel: string, actionName: string, opts: IActionOpts, c
         })
       })
     })
+
+    await Promise.all(promises)
   }
 
   if (!(opts.raw) && !isEmpty(opts.schema)) {

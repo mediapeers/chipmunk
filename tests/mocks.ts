@@ -4,6 +4,7 @@ import {IConfig} from '../src/config'
 import {matches} from './setup'
 
 import userContext from './fixtures/user.context'
+import userManagerContext from './fixtures/user_manager.context'
 import phoneContext from './fixtures/phone.context'
 import organizationContext from './fixtures/organization.context'
 import sessionContext from './fixtures/session.context'
@@ -20,6 +21,10 @@ export const mockContexts = (config: IConfig) => {
     .get(matches('context/user/phone'))
     .optionally()
     .reply(200, phoneContext)
+
+    .get(matches('context/user/manager'))
+    .optionally()
+    .reply(200, userManagerContext)
 
     .get(matches('context/user'))
     .optionally()
