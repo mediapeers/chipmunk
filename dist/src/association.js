@@ -93,8 +93,6 @@ exports.assign = (targets, objects, name, config) => {
     });
     lodash_1.each(objects, (object) => {
         lodash_1.each(lodash_1.get(object, '@associations', []), (ref) => {
-            if (lodash_1.isArray(ref))
-                throw new Error('got array of references, but expecting one reference only!');
             const target = targetsById[ref];
             if (!lodash_1.isEmpty(target)) {
                 const value = readProp(target, name);
