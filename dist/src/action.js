@@ -54,6 +54,8 @@ const validateParams = (action, params, config) => {
     return true;
 };
 const resolve = (objects, schema, config) => __awaiter(this, void 0, void 0, function* () {
+    if (lodash_1.isEmpty(objects))
+        return [];
     lodash_1.merge(schema, {
         '@context': true,
         '@id': true,
