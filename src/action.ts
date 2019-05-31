@@ -87,6 +87,8 @@ const validateParams = (action: IAction, params, config): boolean => {
 }
 
 const resolve = async (objects, schema, config) => {
+  if (isEmpty(objects)) return []
+
   merge(schema, {
     '@context': true,
     '@id': true,
