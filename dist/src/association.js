@@ -17,7 +17,7 @@ const context_1 = __importDefault(require("./context"));
 const action_1 = __importDefault(require("./action"));
 exports.extractReferences = (objects, name) => {
     const result = lodash_1.flatten(lodash_1.compact(lodash_1.map(objects, (o) => lodash_1.get(o, `@associations.${name}`))));
-    result.isHabtm = lodash_1.isArray(lodash_1.get(lodash_1.first(objects), `@associations.${name}`));
+    result.isHabtm = lodash_1.some(objects, (object) => lodash_1.isArray(lodash_1.get(object, `@associations.${name}`)));
     return result;
 };
 exports.extractProps = (context, references) => {
@@ -62,7 +62,11 @@ const readProp = (object, name) => {
     }
 };
 exports.fetch = (objects, name, config) => __awaiter(this, void 0, void 0, function* () {
-    const objectContext = yield context_1.default(lodash_1.first(objects)['@context'], config);
+    const contexts = yield Promise.all(lodash_1.map(objects, (obj) => context_1.default(obj['@context'], config)));
+    const objectContext = lodash_1.find(contexts, (context) => context.associations[name]);
+    if (!objectContext) {
+        throw new Error(`could not find the requested association '${name}'`);
+    }
     const associationProperty = objectContext.associations[name];
     const associationContext = yield context_1.default(associationProperty.type, config);
     const references = exports.extractReferences(objects, name);

@@ -428,18 +428,6 @@ declare const _default: {
                 exportable: boolean;
                 type: string;
             };
-            geo_scopes: {
-                type: string;
-                collection: boolean;
-                readable: boolean;
-                writable: boolean;
-                exportable: boolean;
-                validations: {
-                    length: {
-                        maximum: number;
-                    };
-                }[];
-            };
             groups: {
                 type: string;
                 collection: boolean;

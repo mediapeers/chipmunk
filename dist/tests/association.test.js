@@ -54,7 +54,10 @@ describe('association', () => {
             it('fetches the organizations for a set of users', () => __awaiter(this, void 0, void 0, function* () {
                 nock_1.default(config.endpoints.um)
                     .get(setup_1.matches('/organizations/104,105'))
-                    .reply(200, { members: [{ id: 'first' }, { id: 'second' }] });
+                    .reply(200, { members: [
+                        { '@context': 'https://um.api.mediapeers.mobi/v20140601/context/user', id: 'first' },
+                        { '@context': 'https://um.api.mediapeers.mobi/v20140601/context/user', id: 'second' },
+                    ] });
                 const users = [
                     {
                         '@id': 'https://um.api.mediapeers.mobi/v20140601/user/1659',
@@ -85,7 +88,10 @@ describe('association', () => {
             it('fetches the phones for a set of users', () => __awaiter(this, void 0, void 0, function* () {
                 nock_1.default(config.endpoints.um)
                     .get(setup_1.matches('/users/1659,1660/phones'))
-                    .reply(200, { members: [{ id: 'first' }, { id: 'second' }] });
+                    .reply(200, { members: [
+                        { '@context': 'https://um.api.mediapeers.mobi/v20140601/context/user', id: 'first' },
+                        { '@context': 'https://um.api.mediapeers.mobi/v20140601/context/user', id: 'second' },
+                    ] });
                 const users = [
                     {
                         '@id': 'https://um.api.mediapeers.mobi/v20140601/user/1659',
@@ -114,11 +120,23 @@ describe('association', () => {
             it('fetches the geo scopes for a set of users', () => __awaiter(this, void 0, void 0, function* () {
                 nock_1.default(config.endpoints.um)
                     .get(setup_1.matches('/geo_scopes/UGA,SWZ,UZB,XEU'))
-                    .reply(200, { members: [{ id: 'first' }, { id: 'second' }] });
+                    .reply(200, { members: [
+                        { '@context': 'https://um.api.mediapeers.mobi/v20140601/context/geo_scope', id: 'UGA' },
+                        { '@context': 'https://um.api.mediapeers.mobi/v20140601/context/geo_scope', id: 'SWZ' },
+                        { '@context': 'https://um.api.mediapeers.mobi/v20140601/context/geo_scope', id: 'UZB' },
+                        { '@context': 'https://um.api.mediapeers.mobi/v20140601/context/geo_scope', id: 'XEU' },
+                    ] });
                 const users = [
                     {
-                        '@id': 'https://um.api.mediapeers.mobi/v20140601/user/1659',
+                        '@id': 'https://um.api.mediapeers.mobi/v20140601/user/1',
                         '@context': 'https://um.api.mediapeers.mobi/v20140601/context/user',
+                        '@type': 'user',
+                        '@associations': {},
+                        id: 1,
+                    },
+                    {
+                        '@id': 'https://um.api.mediapeers.mobi/v20140601/user/1659',
+                        '@context': 'https://um.api.mediapeers.mobi/v20140601/context/user/manager',
                         '@type': 'user',
                         '@associations': {
                             geo_scopes: [
@@ -130,7 +148,7 @@ describe('association', () => {
                     },
                     {
                         '@id': 'https://um.api.mediapeers.mobi/v20140601/user/1660',
-                        '@context': 'https://um.api.mediapeers.mobi/v20140601/context/user',
+                        '@context': 'https://um.api.mediapeers.mobi/v20140601/context/user/manager',
                         '@type': 'user',
                         '@associations': {
                             geo_scopes: [

@@ -26,7 +26,10 @@ describe('action', () => {
         it('queries for users', () => __awaiter(this, void 0, void 0, function* () {
             nock_1.default(config.endpoints.um)
                 .get(setup_1.matches('/users'))
-                .reply(200, { members: [{ id: 'first' }, { id: 'second' }] });
+                .reply(200, { members: [
+                    { '@context': 'https://um.api.mediapeers.mobi/v20140601/context/user', id: 'first' },
+                    { '@context': 'https://um.api.mediapeers.mobi/v20140601/context/user', id: 'second' },
+                ] });
             yield chipmunk.run((ch) => __awaiter(this, void 0, void 0, function* () {
                 const result = yield ch.action('um.user', 'query');
                 chai_1.expect(result.objects.length).to.be.gt(1);
@@ -35,7 +38,10 @@ describe('action', () => {
         it('throws if trying to access (not yet) resolved association data', () => __awaiter(this, void 0, void 0, function* () {
             const scope = nock_1.default(config.endpoints.um)
                 .get(setup_1.matches('/users'))
-                .reply(200, { members: [{ id: 'first' }, { id: 'second' }] });
+                .reply(200, { members: [
+                    { '@context': 'https://um.api.mediapeers.mobi/v20140601/context/user', id: 'first' },
+                    { '@context': 'https://um.api.mediapeers.mobi/v20140601/context/user', id: 'second' },
+                ] });
             yield chipmunk.run((ch) => __awaiter(this, void 0, void 0, function* () {
                 const result = yield ch.action('um.user', 'query');
                 chai_1.expect(() => result.objects[0].organization).to.throw(/association not loaded/);
@@ -46,17 +52,58 @@ describe('action', () => {
         it(`moves association reference into '@associations'`, () => __awaiter(this, void 0, void 0, function* () {
             const scope = nock_1.default(config.endpoints.um)
                 .get(setup_1.matches('/users'))
-                .reply(200, { members: [{ id: 'first', organization: { '@id': 'http://um.app/organization/1' } }, { id: 'second' }] });
+                .reply(200, { members: [
+                    {
+                        '@context': 'https://um.api.mediapeers.mobi/v20140601/context/user',
+                        id: 'first',
+                        organization: { '@id': 'http://um.app/organization/1' },
+                    },
+                    {
+                        '@context': 'https://um.api.mediapeers.mobi/v20140601/context/user',
+                        id: 'second',
+                    },
+                ] });
             yield chipmunk.run((ch) => __awaiter(this, void 0, void 0, function* () {
                 const result = yield ch.action('um.user', 'query');
                 chai_1.expect(result.object['@associations'].organization).to.eql('http://um.app/organization/1');
+            }));
+        }));
+        it(`moves subclass specific association references`, () => __awaiter(this, void 0, void 0, function* () {
+            const scope = nock_1.default(config.endpoints.um)
+                .get(setup_1.matches('/users'))
+                .reply(200, {
+                members: [
+                    {
+                        '@context': 'https://um.api.mediapeers.mobi/v20140601/context/user/manager',
+                        id: 'first',
+                        organization: { '@id': 'http://um.app/organizations/1' },
+                        geo_scopes: [
+                            { '@id': 'https://um.api.mediapeers.mobi/v20140601/geo_scope/UGA' },
+                            { '@id': 'https://um.api.mediapeers.mobi/v20140601/geo_scope/SWZ' },
+                        ],
+                    },
+                    {
+                        '@context': 'https://um.api.mediapeers.mobi/v20140601/context/user',
+                        id: 'second',
+                        organization: { '@id': 'http://um.app/organizations/1' },
+                    }
+                ]
+            });
+            yield chipmunk.run((ch) => __awaiter(this, void 0, void 0, function* () {
+                const result = yield ch.action('um.user', 'query');
+                chai_1.expect(result.objects[0]['@associations'].organization).to.equal('http://um.app/organizations/1');
+                chai_1.expect(result.objects[0]['@associations'].geo_scopes).to.eql([
+                    'https://um.api.mediapeers.mobi/v20140601/geo_scope/UGA',
+                    'https://um.api.mediapeers.mobi/v20140601/geo_scope/SWZ',
+                ]);
+                chai_1.expect(result.objects[1]['@associations'].organization).to.equal('http://um.app/organizations/1');
             }));
         }));
         it(`returns pagination results`, () => __awaiter(this, void 0, void 0, function* () {
             const scope = nock_1.default(config.endpoints.um)
                 .get(setup_1.matches('/users'))
                 .reply(200, {
-                members: [{ id: 'first' }],
+                members: [{ '@context': 'https://um.api.mediapeers.mobi/v20140601/context/user', id: 'first' }],
                 '@total_pages': 3,
                 '@total_count': 14,
                 '@current_page': 1,
@@ -75,7 +122,7 @@ describe('action', () => {
             const scope = nock_1.default(config.endpoints.um)
                 .get(setup_1.matches('/users'))
                 .reply(200, {
-                members: [{ id: 'first' }],
+                members: [{ '@context': 'https://um.api.mediapeers.mobi/v20140601/context/user', id: 'first' }],
                 aggregations: {
                     count_by_gender: {
                         buckets: [
@@ -99,7 +146,7 @@ describe('action', () => {
         it('sends uri params', () => __awaiter(this, void 0, void 0, function* () {
             nock_1.default(config.endpoints.um)
                 .get(setup_1.matches('users/1659'))
-                .reply(200, { id: 'one' });
+                .reply(200, { '@context': 'https://um.api.mediapeers.mobi/v20140601/context/user', id: 'one' });
             yield chipmunk.run((ch) => __awaiter(this, void 0, void 0, function* () {
                 const result = yield ch.action('um.user', 'get', { params: { user_ids: 1659 } });
                 chai_1.expect(result.objects.length).to.equal(1);

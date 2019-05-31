@@ -113,9 +113,10 @@ exports.default = (appModel, actionName, opts, config) => __awaiter(this, void 0
     else if (!lodash_1.isEmpty(response.body))
         objects = [response.body];
     if (!opts.raw) {
-        lodash_1.each(objects, (object) => {
+        const promises = lodash_1.map(objects, (object) => __awaiter(this, void 0, void 0, function* () {
+            const objectContext = yield context_1.default(object['@context'], config);
             object['@associations'] = {};
-            lodash_1.each(context.associations, (_def, name) => {
+            lodash_1.each(objectContext.associations, (_def, name) => {
                 const data = object[name];
                 if (object[name]) {
                     object['@associations'][name] = lodash_1.isArray(data) ? lodash_1.map(data, '@id') : lodash_1.get(data, '@id');
@@ -124,7 +125,8 @@ exports.default = (appModel, actionName, opts, config) => __awaiter(this, void 0
                     get: () => exports.associationNotLoaded(name)()
                 });
             });
-        });
+        }));
+        yield Promise.all(promises);
     }
     if (!(opts.raw) && !lodash_1.isEmpty(opts.schema)) {
         const schema = schema_1.default(opts.schema);

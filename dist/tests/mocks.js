@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const nock_1 = __importDefault(require("nock"));
 const setup_1 = require("./setup");
 const user_context_1 = __importDefault(require("./fixtures/user.context"));
+const user_manager_context_1 = __importDefault(require("./fixtures/user_manager.context"));
 const phone_context_1 = __importDefault(require("./fixtures/phone.context"));
 const organization_context_1 = __importDefault(require("./fixtures/organization.context"));
 const session_context_1 = __importDefault(require("./fixtures/session.context"));
@@ -19,6 +20,9 @@ exports.mockContexts = (config) => {
         .get(setup_1.matches('context/user/phone'))
         .optionally()
         .reply(200, phone_context_1.default)
+        .get(setup_1.matches('context/user/manager'))
+        .optionally()
+        .reply(200, user_manager_context_1.default)
         .get(setup_1.matches('context/user'))
         .optionally()
         .reply(200, user_context_1.default)
