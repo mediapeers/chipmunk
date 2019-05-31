@@ -113,9 +113,6 @@ export const assign = (targets: any[], objects: any[], name: string, config: ICo
   */
   each(objects, (object) => {
     each(get(object, '@associations', []), (ref) => {
-      // if we get an array, this can't be an has_many association -> something is wrong
-      if (isArray(ref)) throw new Error('got array of references, but expecting one reference only!')
-
       const target = targetsById[ref]
       if (!isEmpty(target)) {
         const value = readProp(target, name)
