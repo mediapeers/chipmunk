@@ -1,5 +1,5 @@
 import UriTemplate from 'uri-templates'
-import {first, compact, attempt, values, merge, pick, assign as write, reduce, map, get, flatten, each, isEmpty, isArray} from 'lodash'
+import {first, some, find, compact, attempt, values, merge, pick, assign as write, reduce, map, get, flatten, each, isEmpty, isArray} from 'lodash'
 
 import {IConfig} from './config'
 import getContext, {IAction, IContext} from './context'
@@ -11,7 +11,7 @@ interface IRefs extends Array<{ [s: string]: any }> {
 
 export const extractReferences = (objects, name):IRefs => {
   const result = flatten(compact(map(objects, (o) => get(o, `@associations.${name}`)))) as IRefs
-  result.isHabtm = isArray(get(first(objects), `@associations.${name}`))
+  result.isHabtm = some(objects, (object) => isArray(get(object, `@associations.${name}`)))
 
   return result
 }
@@ -66,7 +66,14 @@ const readProp = (object, name) => {
 }
 
 export const fetch = async (objects: any[], name: string, config: IConfig):Promise<IResult> => {
-  const objectContext = await getContext(first(objects)['@context'], config)
+  // since it might be possible the association we're looking for is only available for a subset of our objects
+  // we first need to find the context that contains a definition for the desired association..
+  const contexts = await Promise.all(map(objects, (obj) => getContext(obj['@context'], config)))
+  const objectContext = find(contexts, (context) => context.associations[name]) as IContext
+
+  if (!objectContext) {
+    throw new Error(`could not find the requested association '${name}'`)
+  }
 
   const associationProperty = objectContext.associations[name]
   const associationContext = await getContext(associationProperty.type, config)

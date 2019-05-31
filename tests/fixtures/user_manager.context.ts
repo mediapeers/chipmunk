@@ -1,6 +1,6 @@
 export default {
   '@context': {
-    '@id': 'https://um.api.mediapeers.mobi/v20140601/context/user',
+    '@id': 'https://um.api.mediapeers.mobi/v20140601/context/user/manager',
     '@context': 'https://um.api.mediapeers.mobi/v20140601/context/context',
     '@type': 'context',
     properties:
@@ -323,6 +323,13 @@ export default {
           writable: true,
           exportable: true,
           type: 'string' },
+       geo_scopes:
+        { type: 'https://um.api.mediapeers.mobi/v20140601/context/geo_scope',
+          collection: true,
+          readable: true,
+          writable: true,
+          exportable: true,
+          validations: [ { length: { maximum: 24 } } ] },
        groups:
         { type: 'https://um.api.mediapeers.mobi/v20140601/context/group',
           collection: true,
