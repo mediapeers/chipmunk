@@ -9,6 +9,7 @@ import phoneContext from './fixtures/phone.context'
 import organizationContext from './fixtures/organization.context'
 import sessionContext from './fixtures/session.context'
 import geoScopeContext from './fixtures/geo_scope.context'
+import tucoContext from './fixtures/tuco.context'
 
 export const mockContexts = (config: IConfig) => {
   nock(config.endpoints.um)
@@ -41,4 +42,11 @@ export const mockContexts = (config: IConfig) => {
     .get(matches('context/foo'))
     .optionally()
     .reply(404)
+
+  nock(config.endpoints.tuco)
+    .persist()
+
+    .get(matches('context/request'))
+    .optionally()
+    .reply(200, tucoContext)
 }
