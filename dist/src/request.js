@@ -12,6 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const superagent_1 = __importDefault(require("superagent"));
+const superdebug_1 = __importDefault(require("superdebug"));
 const lodash_1 = require("lodash");
 const querystringify_1 = require("querystringify");
 const watcher_1 = require("./watcher");
@@ -20,6 +21,8 @@ exports.isNode = () => {
 };
 exports.request = (config, headers) => {
     const req = superagent_1.default.agent();
+    if (config.verbose)
+        req.use(superdebug_1.default(console.info));
     req.set({ 'Accept-Encoding': 'gzip,deflate' });
     headers = lodash_1.merge({}, config.headers, headers);
     lodash_1.each(headers, (value, key) => {

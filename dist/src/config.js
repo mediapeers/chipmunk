@@ -8,6 +8,7 @@ const DEFAULTS = {
         'Mpx-Flavours': {},
     },
     devMode: false,
+    verbose: false,
     cache: {
         default: null,
         prefix: 'anonymous',

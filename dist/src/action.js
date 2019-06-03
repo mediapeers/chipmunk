@@ -79,15 +79,7 @@ const resolve = (objects, schema, config) => __awaiter(this, void 0, void 0, fun
     yield Promise.all(promises);
     return lodash_1.map(objects, (o) => lodash_1.pick(o, lodash_1.keys(schema)));
 });
-exports.associationNotLoaded = (name) => {
-    return () => {
-        const err = new NotLoadedError(`'${name}' association not loaded`);
-        err.name = 'NotLoadedError';
-        throw err;
-    };
-};
-exports.default = (appModel, actionName, opts, config) => __awaiter(this, void 0, void 0, function* () {
-    opts = lodash_1.merge({}, DEFAULT_OPTS, opts);
+const performAction = (appModel, actionName, opts, config) => __awaiter(this, void 0, void 0, function* () {
     const context = yield context_1.default(appModel, config);
     const action = context.action(actionName);
     const body = format_1.default(opts.body, opts.multi, opts.ROR);
@@ -130,7 +122,7 @@ exports.default = (appModel, actionName, opts, config) => __awaiter(this, void 0
         }));
         yield Promise.all(promises);
     }
-    if (!(opts.raw) && !lodash_1.isEmpty(opts.schema)) {
+    if (!opts.raw && !lodash_1.isEmpty(opts.schema)) {
         const schema = schema_1.default(opts.schema);
         objects = yield resolve(objects, schema, config);
     }
@@ -155,5 +147,45 @@ exports.default = (appModel, actionName, opts, config) => __awaiter(this, void 0
         });
     }
     return result;
+});
+const performProxiedAction = (appModel, actionName, opts, config) => __awaiter(this, void 0, void 0, function* () {
+    const context = yield context_1.default('tuco.request', config);
+    const action = context.action('proxy');
+    const body = {
+        appModel,
+        actionName,
+        opts: lodash_1.omit(opts, 'proxy'),
+        config: lodash_1.omit(config, 'errorInterceptor', 'devMode', 'verbose', 'cache', 'watcher')
+    };
+    const req = request_1.request(config)
+        .post(action.template)
+        .send(body);
+    const response = yield request_1.run(action.template, req, config);
+    const objects = lodash_1.get(response, 'body.objects', []);
+    const result = {
+        objects: objects,
+        get object() { return lodash_1.first(objects); },
+        headers: lodash_1.get(response, 'body.headers', {}),
+        type: lodash_1.get(response, 'body.type'),
+        aggregations: lodash_1.get(response, 'body.aggregations'),
+        pagination: lodash_1.get(response, 'body.pagination'),
+    };
+    return result;
+});
+exports.associationNotLoaded = (name) => {
+    return () => {
+        const err = new NotLoadedError(`'${name}' association not loaded`);
+        err.name = 'NotLoadedError';
+        throw err;
+    };
+};
+exports.default = (appModel, actionName, opts, config) => __awaiter(this, void 0, void 0, function* () {
+    opts = lodash_1.merge({}, DEFAULT_OPTS, opts);
+    if (opts.proxy && lodash_1.isEmpty(opts.schema)) {
+        throw new Error('Proxying is supported only if a schema is given, too.');
+    }
+    return opts.proxy ?
+        performProxiedAction(appModel, actionName, opts, config) :
+        performAction(appModel, actionName, opts, config);
 });
 //# sourceMappingURL=action.js.map

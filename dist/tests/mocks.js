@@ -11,6 +11,7 @@ const phone_context_1 = __importDefault(require("./fixtures/phone.context"));
 const organization_context_1 = __importDefault(require("./fixtures/organization.context"));
 const session_context_1 = __importDefault(require("./fixtures/session.context"));
 const geo_scope_context_1 = __importDefault(require("./fixtures/geo_scope.context"));
+const tuco_context_1 = __importDefault(require("./fixtures/tuco.context"));
 exports.mockContexts = (config) => {
     nock_1.default(config.endpoints.um)
         .persist()
@@ -35,5 +36,10 @@ exports.mockContexts = (config) => {
         .get(setup_1.matches('context/foo'))
         .optionally()
         .reply(404);
+    nock_1.default(config.endpoints.tuco)
+        .persist()
+        .get(setup_1.matches('context/request'))
+        .optionally()
+        .reply(200, tuco_context_1.default);
 };
 //# sourceMappingURL=mocks.js.map

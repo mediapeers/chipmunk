@@ -31,6 +31,7 @@ const DEFAULT_CONFIG = {
         ac: "https://ac.api.mediapeers.mobi/v20140601",
         sm: "https://sm.api.mediapeers.mobi/v20140601",
         mc: "https://mc.api.mediapeers.mobi/v20140601",
+        tuco: "https://tuco.api.mediapeers.mobi",
     },
 };
 exports.setup = (overrides) => {
