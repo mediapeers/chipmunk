@@ -13,6 +13,7 @@ import chipmunk, {IChipmunk} from '../src'
 import {mockContexts} from './mocks'
 
 const DEFAULT_CONFIG = {
+  //verbose: true,
   timestamp: null,
   headers: {
     'Affiliation-Id': 'mpx',
@@ -24,6 +25,7 @@ const DEFAULT_CONFIG = {
     ac: "https://ac.api.mediapeers.mobi/v20140601",
     sm: "https://sm.api.mediapeers.mobi/v20140601",
     mc: "https://mc.api.mediapeers.mobi/v20140601",
+    tuco: "https://tuco.api.mediapeers.mobi",
   },
 }
 

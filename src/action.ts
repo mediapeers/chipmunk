@@ -1,5 +1,5 @@
 import UriTemplate from 'uri-templates'
-import {each, pick, pickBy, keys, reduce, filter, get, merge, first, map, isArray, isEmpty, isPlainObject} from 'lodash'
+import {each, omit, pick, pickBy, keys, reduce, filter, get, merge, first, map, isArray, isEmpty, isPlainObject} from 'lodash'
 import {stringify} from 'querystringify'
 
 import {IConfig} from './config'
@@ -117,18 +117,7 @@ const resolve = async (objects, schema, config) => {
   return map(objects, (o) => pick(o, keys(schema)))
 }
 
-export const associationNotLoaded = (name) => {
-  return () => {
-    const err = new NotLoadedError(`'${name}' association not loaded`)
-    err.name = 'NotLoadedError'
-
-    throw err
-  }
-}
-
-export default async (appModel: string, actionName: string, opts: IActionOpts, config: IConfig): Promise<IResult> => {
-  opts = merge({}, DEFAULT_OPTS, opts)
-
+const performAction = async (appModel: string, actionName: string, opts: IActionOpts, config: IConfig): Promise<IResult> => {
   const context = await getContext(appModel, config)
   const action = context.action(actionName)
   const body = format(opts.body, opts.multi, opts.ROR)
@@ -184,7 +173,7 @@ export default async (appModel: string, actionName: string, opts: IActionOpts, c
     await Promise.all(promises)
   }
 
-  if (!(opts.raw) && !isEmpty(opts.schema)) {
+  if (!opts.raw && !isEmpty(opts.schema)) {
     const schema = parseSchema(opts.schema)
     objects = await resolve(objects, schema, config)
   }
@@ -214,4 +203,55 @@ export default async (appModel: string, actionName: string, opts: IActionOpts, c
   }
 
   return result
+}
+
+const performProxiedAction = async (appModel: string, actionName: string, opts: IActionOpts, config: IConfig): Promise<IResult> => {
+  const context = await getContext('tuco.request', config)
+  const action = context.action('proxy')
+
+  const body = {
+    appModel,
+    actionName,
+    opts: omit(opts, 'proxy'),
+    config: omit(config, 'errorInterceptor', 'devMode', 'verbose', 'cache', 'watcher')
+  }
+
+  const req = request(config)
+    .post(action.template)
+    .send(body)
+
+  const response = await run(action.template, req, config)
+  const objects = get(response, 'body.objects', []) as IObject[]
+
+  const result: IResult = {
+    objects: objects,
+    get object() { return first(objects) },
+    headers: get(response, 'body.headers', {}),
+    type: get(response, 'body.type'),
+    aggregations: get(response, 'body.aggregations'),
+    pagination: get(response, 'body.pagination'),
+  }
+
+  return result
+}
+
+export const associationNotLoaded = (name) => {
+  return () => {
+    const err = new NotLoadedError(`'${name}' association not loaded`)
+    err.name = 'NotLoadedError'
+
+    throw err
+  }
+}
+
+export default async (appModel: string, actionName: string, opts: IActionOpts, config: IConfig): Promise<IResult> => {
+  opts = merge({}, DEFAULT_OPTS, opts)
+
+  if (opts.proxy && isEmpty(opts.schema)) {
+    throw new Error('Proxying is supported only if a schema is given, too.')
+  }
+
+  return opts.proxy ?
+    performProxiedAction(appModel, actionName, opts, config) :
+    performAction(appModel, actionName, opts, config)
 }

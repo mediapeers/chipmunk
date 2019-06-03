@@ -19,7 +19,8 @@ export const isNode = (): boolean => {
 
 export const request = (config: IConfig, headers?: { [s: string]: any }): SuperAgentStatic => {
   const req = superagent.agent()
-    //.use(superdebug(console.info))
+
+  if (config.verbose) req.use(superdebug(console.info))
 
   req.set({ 'Accept-Encoding' : 'gzip,deflate' })
 
