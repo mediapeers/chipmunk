@@ -62,7 +62,7 @@ exec('git add --update', (result) => {
 })
 
 exec(['git', 'commit', '-m "new distribution release"'], (result) => {
-  if (!result.success) abort("failed to save new commit")
+  if (!result.success) console.log("failed to save new commit. no typescript changes!? continuing.")
 })
 
 exec('git push', (result) => {
