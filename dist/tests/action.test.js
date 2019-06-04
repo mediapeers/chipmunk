@@ -152,6 +152,12 @@ describe('action', () => {
             chai_1.expect(result.objects.length).to.equal(1);
         }));
     }));
+    it('uses forced member action endpoint', () => __awaiter(this, void 0, void 0, function* () {
+        nock_1.default(config.endpoints.um)
+            .get(setup_1.matches('user/1659'))
+            .reply(200, { '@context': 'https://um.api.mediapeers.mobi/v20140601/context/user', id: 'one' });
+        yield chipmunk.action('um.user', 'member.get', { params: { user_id: 1659 } });
+    }));
     it('sends additional params', () => __awaiter(this, void 0, void 0, function* () {
         nock_1.default(config.endpoints.um)
             .get(setup_1.matches('users'))

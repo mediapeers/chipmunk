@@ -47,9 +47,12 @@ exports.default = (urlOrAppModel, config) => __awaiter(this, void 0, void 0, fun
     if (config.cache.enabled && config.cache.default) {
         cache_1.set(url, lodash_1.cloneDeep(context), { engine: config.cache.default }, config);
     }
-    context.action = (name) => {
-        let action;
-        if (context.collection_actions[name]) {
+    context.action = (actionName) => {
+        let action, type, name;
+        name = actionName;
+        if (lodash_1.includes(actionName, '.'))
+            [type, name] = actionName.split('.');
+        if (type !== 'member' && context.collection_actions[name]) {
             action = context.collection_actions[name];
             action.collection = true;
         }
