@@ -1,4 +1,4 @@
-import {get, first, reduce, merge, cloneDeep} from 'lodash'
+import {get, first, reduce, includes, merge, cloneDeep} from 'lodash'
 import {IConfig} from './config'
 import {request, run} from './request'
 import {set as cacheSet, get as cacheGet} from './cache'
@@ -77,9 +77,13 @@ export default async (urlOrAppModel: string, config: IConfig):Promise<IContext> 
     cacheSet(url, cloneDeep(context), { engine: config.cache.default }, config)
   }
 
-  context.action = (name: string):IAction => {
-    let action
-    if (context.collection_actions[name]) {
+  context.action = (actionName: string):IAction => {
+    let action, type, name
+
+    name = actionName
+    if (includes(actionName, '.')) [type, name] = actionName.split('.')
+
+    if (type !== 'member' && context.collection_actions[name]) {
       action = context.collection_actions[name]
       action.collection = true
     }
