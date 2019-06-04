@@ -209,8 +209,8 @@ ch.cache.get('foo', { noPrefix: true, engine: 'runtime' }) // => bar
 
 ### 'perform later' jobs
 
-chipmunk (as chinchilla did previously) offers convenience functionality to second level priority code after the important stuff has been processed.
-this allows for example to lazy load less important data after all important stuff has been handled.
+chipmunk (as chinchilla did previously) offers convenience functionality to run second level priority code after the important stuff has been processed.
+this allows for example to lazy load less important data after all important data has been gathered.
 
 an example:
 

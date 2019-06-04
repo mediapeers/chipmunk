@@ -162,6 +162,14 @@ describe('action', () => {
     })
   })
 
+  it('uses forced member action endpoint', async () => {
+    nock(config.endpoints.um)
+      .get(matches('user/1659'))
+      .reply(200, { '@context': 'https://um.api.mediapeers.mobi/v20140601/context/user', id: 'one' })
+
+    await chipmunk.action('um.user', 'member.get', { params: { user_id: 1659 } })
+  })
+
   it('sends additional params', async () => {
     nock(config.endpoints.um)
       .get(matches('users'))
