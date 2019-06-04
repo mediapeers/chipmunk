@@ -180,7 +180,7 @@ exports.associationNotLoaded = (name) => {
     };
 };
 exports.default = (appModel, actionName, opts, config) => __awaiter(this, void 0, void 0, function* () {
-    opts = lodash_1.merge({}, DEFAULT_OPTS, opts);
+    opts = lodash_1.merge({}, DEFAULT_OPTS, { proxy: !lodash_1.isEmpty(opts.schema) }, opts);
     if (opts.proxy && lodash_1.isEmpty(opts.schema)) {
         throw new Error('Proxying is supported only if a schema is given, too.');
     }

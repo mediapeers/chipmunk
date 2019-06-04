@@ -266,6 +266,7 @@ describe('action', () => {
         ];
         yield chipmunk.run((ch) => __awaiter(this, void 0, void 0, function* () {
             const result = yield ch.action('um.user', 'query', {
+                proxy: false,
                 schema: 'first_name, last_name, organization { name }'
             });
             chai_1.expect(result.objects).to.eql(expected);
@@ -302,7 +303,6 @@ describe('action', () => {
                     { '@context': 'https://um.api.mediapeers.mobi/v20140601/context/user', id: 'second' },
                 ] });
             yield chipmunk.action('um.user', 'query', {
-                proxy: true,
                 schema: 'id, first_name',
             });
             chai_1.expect(lodash_1.get(body, 'config.endpoints')).to.exist;
