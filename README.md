@@ -2,28 +2,14 @@
 
 ## main goals
 
-### NOTES
-
 * slim & simple compared to _chinchilla_
 * better suited for react apps
 * functional with hopefully no memory leaks
 * tested
 
-### DONE
+## interface
 
-* no differenciation between member/collection actions..
-* simple interface for PUT/POST requests
-* proper error handling instead of non-resolving promises
-* no cookie management
-* optional ruby on rails object formatting, or implicitly via a flag in specifications indicating a specific action supports rails nested attributes
-* manual association resolving
-* return reduced result set based on given attributes
-* _viscacha_-like association resolve functionality
-* caching
-
-### interface
-
-#### setup, run blocks (always use run blocks!)
+### setup, run blocks (always use run blocks!)
 
 ```javascript
 const chipmunk = createChipmunk({
@@ -47,14 +33,24 @@ chipmunk.run(async (ch) => {
 
 ```
 
-#### contexts
+### optional configuration options
+
+*verbose mode*
+
+```javascript
+ch.updateConfig({ verbose: true })
+```
+
+### contexts
 
 ```javascript
 // get context
 await ch.context('um.user')
 ```
 
-#### actions
+### actions
+
+#### examples
 
 ```javascript
 // get user, default method
@@ -65,6 +61,20 @@ await ch.action('um.user', 'get', { params: { user_id: 3 } })
 // get user with associations resolved & limited attribute set
 await ch.action('um.user', 'get', {
   params: { user_id: 3 },
+  schema: `
+    id, first_name,
+    organization { name },
+  `
+})
+```
+
+```javascript
+// get user with associations resolved & limited attribute set
+// proxied through tuco (node server) -> only one request, better performance
+// will throw if no schema was provided
+await ch.action('um.user', 'get', {
+  params: { user_id: 3 },
+  proxy: true,
   schema: `
     id, first_name,
     organization { name },
@@ -101,7 +111,50 @@ await ch.action('um.user', 'update', {
 })
 ```
 
-#### associations
+#### optional action options
+
+```javascript
+// convert to Ruby on Rails compatible 'accepts nested attributes' body
+await ch.action('um.user', 'update', {
+  params: { user_id: 3 },
+  ROR: true,
+  body: {
+    first_name: 'johnny',
+    organization: {
+      name: 'walker'
+    }
+  }
+})
+// => converts to
+// {
+//   first_name: 'johnny',
+//   organization_attributes: {
+//     name: 'walker'
+//   }
+// }
+
+// convert to 'multi' update format body (our backends support)
+await ch.action('um.user', 'update', {
+  multi: true,
+  body: [
+    { id: 3, first_name: 'johnny' },
+    { id: 5, first_name: 'hermine' },
+  ]
+})
+// converts to:
+// {
+//   '3': { id: 3, first_name: 'johnny' },
+//   '5': { id: 5, first_name: 'hermine' },
+// }
+
+// return RAW results
+// this does not move association references nor does it support resolving a schema
+await ch.action('um.user', 'query', {
+  raw: true,
+})
+```
+
+### associations
 
 to manually resolve associations:
 
@@ -121,7 +174,7 @@ users = await ch.fetchAndAssign(users, 'organization')
 users[0].organization // => returns org of first user
 ```
 
-#### cache
+### cache
 
 by default, chipmunk prefixes all cache keys with
 - affiliation-id and role-id, if present
@@ -154,7 +207,7 @@ ch.updateConfig({ headers: { 'Role-Id': 8 } })
 ch.cache.get('foo', { noPrefix: true, engine: 'runtime' }) // => bar
 ```
 
-#### 'perform later' jobs
+### 'perform later' jobs
 
 chipmunk (as chinchilla did previously) offers convenience functionality to second level priority code after the important stuff has been processed.
 this allows for example to lazy load less important data after all important stuff has been handled.
