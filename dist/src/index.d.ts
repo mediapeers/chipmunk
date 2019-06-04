@@ -20,6 +20,7 @@ export interface IInterface {
     performLater(cb: Function): void;
     cache: ICache;
 }
+export { IContext, IResult, IConfig };
 export interface IChipmunk extends IInterface {
     run: (block: (ch: IInterface) => Promise<any>, errorHandler?: Function) => Promise<any>;
 }
