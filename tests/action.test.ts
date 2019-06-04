@@ -291,6 +291,7 @@ describe('action', () => {
 
     await chipmunk.run(async (ch) => {
       const result = await ch.action('um.user', 'query', {
+        proxy: false,
         schema: 'first_name, last_name, organization { name }'
       })
 
@@ -335,7 +336,6 @@ describe('action', () => {
         ]})
 
       await chipmunk.action('um.user', 'query', {
-        proxy: true,
         schema: 'id, first_name',
       })
 

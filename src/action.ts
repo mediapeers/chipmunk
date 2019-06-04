@@ -245,7 +245,7 @@ export const associationNotLoaded = (name) => {
 }
 
 export default async (appModel: string, actionName: string, opts: IActionOpts, config: IConfig): Promise<IResult> => {
-  opts = merge({}, DEFAULT_OPTS, opts)
+  opts = merge({}, DEFAULT_OPTS, { proxy: !isEmpty(opts.schema) }, opts)
 
   if (opts.proxy && isEmpty(opts.schema)) {
     throw new Error('Proxying is supported only if a schema is given, too.')
