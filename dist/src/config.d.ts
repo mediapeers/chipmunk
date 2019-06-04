@@ -25,7 +25,6 @@ export interface IConfig {
     headers: IHeaderSettings;
     timestamp: number;
     errorInterceptor(err: IRequestError): boolean;
-    devMode: boolean;
     verbose: boolean;
     cache: ICacheSettings;
     watcher: IWatcher;

@@ -24,9 +24,9 @@ describe('config', () => {
         chai_1.expect(value).to.equal('http://um.app');
     });
     it('merges multiple configs', () => {
-        const conf = config_1.default({ endpoints: { um: 'http://um.app' } }, { devMode: true });
+        const conf = config_1.default({ endpoints: { um: 'http://um.app' } }, { verbose: true });
         chai_1.expect(conf.endpoints.um).to.equal('http://um.app');
-        chai_1.expect(conf.devMode).to.be.true;
+        chai_1.expect(conf.verbose).to.be.true;
     });
     describe('#cachePrefix', () => {
         it('uses affiliation and role as prefix', () => {

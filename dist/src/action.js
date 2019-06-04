@@ -44,8 +44,8 @@ const validateParams = (action, params, config) => {
         const variable = lodash_1.get(required[index], 'variable');
         if (!params[variable]) {
             const msg = `Required param '${variable}' for '${action.template}' missing!`;
-            if (config.devMode)
-                throw new Error(msg);
+            if (config.verbose)
+                console.error(msg);
             else
                 log_1.default(msg);
             return false;
@@ -71,7 +71,7 @@ const resolve = (objects, schema, config) => __awaiter(this, void 0, void 0, fun
         }
         catch (err) {
             log_1.default(`failed to resolve association ${assocName}`);
-            if (config.devMode)
+            if (config.verbose)
                 log_1.default(err, objects, schema);
             return objects;
         }

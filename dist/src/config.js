@@ -7,7 +7,6 @@ const DEFAULTS = {
     headers: {
         'Mpx-Flavours': {},
     },
-    devMode: false,
     verbose: false,
     cache: {
         default: null,

@@ -162,14 +162,6 @@ describe('action', () => {
             chai_1.expect(result).to.be.ok;
         }));
     }));
-    it('throws an error in devMode if required param was missing', () => __awaiter(this, void 0, void 0, function* () {
-        chipmunk.updateConfig({ devMode: true });
-        nock_1.default(config.endpoints.um)
-            .get(setup_1.matches('users'))
-            .reply(200, {});
-        const promise = chipmunk.action('um.user', 'get', { params: {} });
-        yield chai_1.expect(promise).to.be.rejectedWith('Required param');
-    }));
     it('sends additional headers', () => __awaiter(this, void 0, void 0, function* () {
         chipmunk.updateConfig({ headers: { 'Session-Id': '56BA' } });
         nock_1.default(config.endpoints.um)
