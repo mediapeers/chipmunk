@@ -24,7 +24,6 @@ export interface IConfig {
   headers: IHeaderSettings
   timestamp: number
   errorInterceptor(err: IRequestError): boolean
-  devMode: boolean
   verbose: boolean
   cache: ICacheSettings
   watcher: IWatcher
@@ -36,7 +35,6 @@ const DEFAULTS:IConfig = {
   headers: {
     'Mpx-Flavours': {},
   },
-  devMode: false,
   verbose: false,
   cache: {
     default: null,

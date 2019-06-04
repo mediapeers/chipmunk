@@ -29,11 +29,11 @@ describe('config', () => {
   it('merges multiple configs', () => {
     const conf = createConfig(
       { endpoints: { um: 'http://um.app' } },
-      { devMode: true }
+      { verbose: true }
     )
 
     expect(conf.endpoints.um).to.equal('http://um.app')
-    expect(conf.devMode).to.be.true
+    expect(conf.verbose).to.be.true
   })
 
   describe('#cachePrefix', () => {

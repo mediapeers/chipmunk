@@ -76,7 +76,7 @@ const validateParams = (action: IAction, params, config): boolean => {
 
     if (!params[variable]) {
       const msg = `Required param '${variable}' for '${action.template}' missing!`
-      if (config.devMode) throw new Error(msg)
+      if (config.verbose) console.error(msg)
       else log(msg)
 
       return false
@@ -107,7 +107,7 @@ const resolve = async (objects, schema, config) => {
     catch (err) {
       // if we fail to resolve an association, continue anyways
       log(`failed to resolve association ${assocName}`)
-      if (config.devMode) log(err, objects, schema)
+      if (config.verbose) log(err, objects, schema)
       return objects
     }
   })

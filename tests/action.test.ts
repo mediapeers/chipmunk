@@ -174,18 +174,6 @@ describe('action', () => {
     })
   })
 
-  it('throws an error in devMode if required param was missing', async () => {
-    chipmunk.updateConfig({ devMode: true })
-
-    nock(config.endpoints.um)
-      .get(matches('users'))
-      .reply(200, {})
-
-    const promise = chipmunk.action('um.user', 'get', { params: {} })
-
-    await expect(promise).to.be.rejectedWith('Required param')
-  })
-
   it('sends additional headers', async () => {
     chipmunk.updateConfig({ headers: { 'Session-Id': '56BA' } })
 
