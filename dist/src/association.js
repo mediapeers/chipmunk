@@ -24,7 +24,7 @@ exports.extractProps = (context, references) => {
     const memberGet = context.member_actions['get'];
     const collectionGet = context.collection_actions['query'];
     const result = {};
-    lodash_1.each([memberGet, collectionGet], (action) => {
+    lodash_1.each(lodash_1.compact([memberGet, collectionGet]), (action) => {
         const template = uri_templates_1.default(action.template);
         try {
             lodash_1.each(references, (reference) => {
@@ -73,7 +73,7 @@ exports.fetch = (objects, name, config) => __awaiter(this, void 0, void 0, funct
     const extractedProps = exports.extractProps(associationContext, references);
     const params = buildParams(associationContext, extractedProps);
     const actionName = associationProperty.collection && !references.isHabtm ? 'query' : 'get';
-    return action_1.default(associationProperty.type, actionName, { params }, config);
+    return action_1.default(associationProperty.type, 'get', { params }, config);
 });
 exports.assign = (targets, objects, name, config) => {
     const objectsById = lodash_1.reduce(objects, (acc, object) => lodash_1.assign(acc, { [object['@id']]: object }), {});
