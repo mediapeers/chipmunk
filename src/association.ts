@@ -22,10 +22,10 @@ export const extractProps = (context: IContext, references) => {
 
   const result = {}
 
-  each([memberGet, collectionGet], (action) => {
-    try {
-      const template = UriTemplate(action.template)
+  each(compact([memberGet, collectionGet]), (action) => {
+    const template = UriTemplate(action.template)
 
+    try {
       each(references, (reference) => {
         const values = template.fromUri(reference)
 
