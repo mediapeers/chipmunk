@@ -83,7 +83,7 @@ export const fetch = async (objects: any[], name: string, config: IConfig):Promi
   const params = buildParams(associationContext, extractedProps)
 
   const actionName = associationProperty.collection && !references.isHabtm ? 'query' : 'get'
-  return action(associationProperty.type, 'get', { params }, config)
+  return action(associationProperty.type, actionName, { params }, config)
 }
 
 export const assign = (targets: any[], objects: any[], name: string, config: IConfig):void => {
