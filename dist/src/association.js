@@ -73,7 +73,7 @@ exports.fetch = (objects, name, config) => __awaiter(this, void 0, void 0, funct
     const extractedProps = exports.extractProps(associationContext, references);
     const params = buildParams(associationContext, extractedProps);
     const actionName = associationProperty.collection && !references.isHabtm ? 'query' : 'get';
-    return action_1.default(associationProperty.type, 'get', { params }, config);
+    return action_1.default(associationProperty.type, actionName, { params }, config);
 });
 exports.assign = (targets, objects, name, config) => {
     const objectsById = lodash_1.reduce(objects, (acc, object) => lodash_1.assign(acc, { [object['@id']]: object }), {});
