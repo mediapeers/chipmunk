@@ -24,9 +24,9 @@ exports.extractProps = (context, references) => {
     const memberGet = context.member_actions['get'];
     const collectionGet = context.collection_actions['query'];
     const result = {};
-    lodash_1.each(lodash_1.compact([memberGet, collectionGet]), (action) => {
-        const template = uri_templates_1.default(action.template);
+    lodash_1.each([memberGet, collectionGet], (action) => {
         try {
+            const template = uri_templates_1.default(action.template);
             lodash_1.each(references, (reference) => {
                 const values = template.fromUri(reference);
                 lodash_1.each(action.mappings, (mapping) => {
