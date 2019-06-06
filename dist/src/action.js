@@ -94,6 +94,20 @@ const performAction = (appModel, actionName, opts, config) => __awaiter(this, vo
                 .post(uri)
                 .send(body);
             break;
+        case 'PUT':
+            req = request_1.request(config, opts.headers)
+                .put(uri)
+                .send(body);
+            break;
+        case 'PATCH':
+            req = request_1.request(config, opts.headers)
+                .patch(uri)
+                .send(body);
+            break;
+        case 'DELETE':
+            req = request_1.request(config, opts.headers)
+                .delete(uri);
+            break;
         default:
             req = request_1.request(config, opts.headers)
                 .get(uri);

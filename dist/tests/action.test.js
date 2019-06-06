@@ -282,6 +282,24 @@ describe('action', () => {
             chai_1.expect(result.objects[0]).to.eql(expected);
         }));
     }));
+    it('sends a PUT request', () => __awaiter(this, void 0, void 0, function* () {
+        nock_1.default(config.endpoints.um)
+            .put(setup_1.matches('/users/3/invite'))
+            .reply(200, {});
+        yield chipmunk.action('um.user', 'invite', { params: { user_ids: 3 } });
+    }));
+    it('sends a PATCH request', () => __awaiter(this, void 0, void 0, function* () {
+        nock_1.default(config.endpoints.um)
+            .patch(setup_1.matches('/users/3'))
+            .reply(200, {});
+        yield chipmunk.action('um.user', 'update', { params: { user_ids: 3 }, body: {} });
+    }));
+    it('sends a DELETE request', () => __awaiter(this, void 0, void 0, function* () {
+        nock_1.default(config.endpoints.um)
+            .delete(setup_1.matches('/users/3'))
+            .reply(200, {});
+        yield chipmunk.action('um.user', 'delete', { params: { user_ids: 3 } });
+    }));
     describe('proxied via tuco', () => {
         it('throws an error if proxy was requested but no schema given', () => __awaiter(this, void 0, void 0, function* () {
             const block = chipmunk.run((ch) => __awaiter(this, void 0, void 0, function* () {
