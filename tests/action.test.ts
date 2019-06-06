@@ -312,6 +312,30 @@ describe('action', () => {
     })
   })
 
+  it('sends a PUT request', async () => {
+    nock(config.endpoints.um)
+      .put(matches('/users/3/invite'))
+      .reply(200, { })
+
+    await chipmunk.action('um.user', 'invite', { params: { user_ids: 3 } })
+  })
+
+  it('sends a PATCH request', async () => {
+    nock(config.endpoints.um)
+      .patch(matches('/users/3'))
+      .reply(200, { })
+
+    await chipmunk.action('um.user', 'update', { params: { user_ids: 3 }, body: {} })
+  })
+
+  it('sends a DELETE request', async () => {
+    nock(config.endpoints.um)
+      .delete(matches('/users/3'))
+      .reply(200, { })
+
+    await chipmunk.action('um.user', 'delete', { params: { user_ids: 3 } })
+  })
+
   describe('proxied via tuco', () => {
     it('throws an error if proxy was requested but no schema given', async () => {
       const block = chipmunk.run(async (ch) => {
