@@ -137,6 +137,23 @@ const performAction = async (appModel: string, actionName: string, opts: IAction
         .send(body)
       break;
 
+    case 'PUT':
+      req = request(config, opts.headers)
+        .put(uri)
+        .send(body)
+      break;
+
+    case 'PATCH':
+      req = request(config, opts.headers)
+        .patch(uri)
+        .send(body)
+      break;
+
+    case 'DELETE':
+      req = request(config, opts.headers)
+        .delete(uri)
+      break;
+
     default:
       req = request(config, opts.headers)
         .get(uri)
