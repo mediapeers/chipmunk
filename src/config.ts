@@ -1,4 +1,4 @@
-import {merge, get, cloneDeep} from 'lodash'
+import {merge, get, cloneDeep, omit} from 'lodash'
 import {IRequestError} from './request'
 
 export interface IHeaderSettings {
@@ -46,6 +46,10 @@ const DEFAULTS:IConfig = {
     performLaterHandlers: [],
   },
   errorInterceptor: null,
+}
+
+export const cleanConfig = (config: IConfig):Partial<IConfig> => {
+  return omit(config, 'errorInterceptor', 'verbose', 'cache', 'watcher')
 }
 
 export default (...configs: Partial<IConfig>[]):IConfig => {

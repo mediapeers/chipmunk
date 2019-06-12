@@ -3,7 +3,7 @@ import {merge, delay} from 'lodash'
 import context, {IContext} from './context'
 import action, {IResult, IActionOpts} from './action'
 import {fetch, assign} from './association'
-import createConfig, {IConfig} from './config'
+import createConfig, {IConfig, cleanConfig} from './config'
 import {
   ICallOpts, ISetOpts, IUpdateOpts,
   get, set, remove, update, clear
@@ -30,37 +30,10 @@ export interface IInterface {
   cache: ICache
 }
 
-export {IContext, IResult, IConfig, IActionOpts}
+export {IContext, IResult, IConfig, IActionOpts, cleanConfig}
 
 export interface IChipmunk extends IInterface {
   run: (block: (ch: IInterface) => Promise<any>, errorHandler?: Function) => Promise<any>
-}
-
-const scope = (config): IInterface => {
-  const callOpts = (opts) => merge({ engine: config.cache.default }, opts)
-
-  return {
-    currentConfig: () => config,
-    updateConfig: (overrides) => {
-      return config = createConfig(config, overrides)
-    },
-    context: (urlOrAppModel) => context(urlOrAppModel, config),
-    action: (appModel, actionName, opts = {}) => action(appModel, actionName, opts, config),
-    fetch: (objects, name) => fetch(objects, name, config),
-    assign: (targets, objects, name) => assign(targets, objects, name, config),
-    fetchAndAssign: async (targets, name) => {
-      const result = await fetch(targets, name, config)
-      assign(targets, result.objects, name, config)
-    },
-    cache: {
-      set: (key, value, opts) => set(key, value, callOpts(opts), config),
-      get: (key, opts) => get(key, callOpts(opts), config),
-      remove: (key, opts) => remove(key, callOpts(opts), config),
-      update: (key, cb, opts) => update(key, cb, callOpts(opts), config),
-      clear: (opts) => clear(callOpts(opts))
-    },
-    performLater: (cb) => enqueuePerformLater(cb, config),
-  }
 }
 
 export default (...overrides: Partial<IConfig>[]): IChipmunk => {
