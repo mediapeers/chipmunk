@@ -30,7 +30,7 @@ export interface IInterface {
   cache: ICache
 }
 
-export {IContext, IResult, IConfig}
+export {IContext, IResult, IConfig, IActionOpts}
 
 export interface IChipmunk extends IInterface {
   run: (block: (ch: IInterface) => Promise<any>, errorHandler?: Function) => Promise<any>
