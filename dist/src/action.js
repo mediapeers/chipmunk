@@ -13,6 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const uri_templates_1 = __importDefault(require("uri-templates"));
 const lodash_1 = require("lodash");
+const config_1 = require("./config");
 const request_1 = require("./request");
 const context_1 = __importDefault(require("./context"));
 const format_1 = __importDefault(require("./format"));
@@ -169,7 +170,7 @@ const performProxiedAction = (appModel, actionName, opts, config) => __awaiter(t
         appModel,
         actionName,
         opts: lodash_1.omit(opts, 'proxy'),
-        config: lodash_1.omit(config, 'errorInterceptor', 'devMode', 'verbose', 'cache', 'watcher')
+        config: config_1.cleanConfig(config),
     };
     const req = request_1.request(config)
         .post(action.template)

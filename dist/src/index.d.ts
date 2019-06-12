@@ -1,6 +1,6 @@
 import { IContext } from './context';
 import { IResult, IActionOpts } from './action';
-import { IConfig } from './config';
+import { IConfig, cleanConfig } from './config';
 import { ICallOpts, ISetOpts, IUpdateOpts } from './cache';
 export interface ICache {
     set(key: string, value: any, opts?: ISetOpts): void;
@@ -20,7 +20,7 @@ export interface IInterface {
     performLater(cb: Function): void;
     cache: ICache;
 }
-export { IContext, IResult, IConfig, IActionOpts };
+export { IContext, IResult, IConfig, IActionOpts, cleanConfig };
 export interface IChipmunk extends IInterface {
     run: (block: (ch: IInterface) => Promise<any>, errorHandler?: Function) => Promise<any>;
 }

@@ -29,5 +29,6 @@ export interface IConfig {
     watcher?: IWatcher;
     timestamp?: number;
 }
+export declare const cleanConfig: (config: IConfig) => Partial<IConfig>;
 declare const _default: (...configs: Partial<IConfig>[]) => IConfig;
 export default _default;

@@ -19,6 +19,9 @@ const DEFAULTS = {
     },
     errorInterceptor: null,
 };
+exports.cleanConfig = (config) => {
+    return lodash_1.omit(config, 'errorInterceptor', 'verbose', 'cache', 'watcher');
+};
 exports.default = (...configs) => {
     const conf = lodash_1.cloneDeep(configs);
     conf.unshift({}, DEFAULTS);
