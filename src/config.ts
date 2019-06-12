@@ -20,13 +20,13 @@ export interface IWatcher {
 }
 
 export interface IConfig {
-  endpoints: { [s: string]: string }
-  headers: IHeaderSettings
-  timestamp: number
-  errorInterceptor(err: IRequestError): boolean
-  verbose: boolean
-  cache: ICacheSettings
-  watcher: IWatcher
+  endpoints?: { [s: string]: string }
+  headers?: IHeaderSettings
+  errorInterceptor?(err: IRequestError): boolean
+  verbose?: boolean
+  cache?: ICacheSettings
+  watcher?: IWatcher
+  timestamp?: number
 }
 
 const DEFAULTS:IConfig = {
