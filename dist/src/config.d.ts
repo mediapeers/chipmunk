@@ -19,15 +19,15 @@ export interface IWatcher {
     performLaterHandlers: Function[];
 }
 export interface IConfig {
-    endpoints: {
+    endpoints?: {
         [s: string]: string;
     };
-    headers: IHeaderSettings;
-    timestamp: number;
-    errorInterceptor(err: IRequestError): boolean;
-    verbose: boolean;
-    cache: ICacheSettings;
-    watcher: IWatcher;
+    headers?: IHeaderSettings;
+    errorInterceptor?(err: IRequestError): boolean;
+    verbose?: boolean;
+    cache?: ICacheSettings;
+    watcher?: IWatcher;
+    timestamp?: number;
 }
 declare const _default: (...configs: Partial<IConfig>[]) => IConfig;
 export default _default;
