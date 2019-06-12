@@ -2,7 +2,7 @@ import UriTemplate from 'uri-templates'
 import {each, omit, pick, pickBy, keys, reduce, filter, get, merge, first, map, isArray, isEmpty, isPlainObject} from 'lodash'
 import {stringify} from 'querystringify'
 
-import {IConfig} from './config'
+import {IConfig, cleanConfig} from './config'
 import {request, run} from './request'
 import getContext, {IAction} from './context'
 import format from './format'
@@ -230,7 +230,7 @@ const performProxiedAction = async (appModel: string, actionName: string, opts: 
     appModel,
     actionName,
     opts: omit(opts, 'proxy'),
-    config: omit(config, 'errorInterceptor', 'devMode', 'verbose', 'cache', 'watcher')
+    config: cleanConfig(config),
   }
 
   const req = request(config)
