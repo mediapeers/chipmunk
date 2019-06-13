@@ -1,5 +1,5 @@
 import UriTemplate from 'uri-templates'
-import {each, omit, pick, pickBy, keys, reduce, filter, get, merge, first, map, isArray, isEmpty, isPlainObject} from 'lodash'
+import {each, includes, uniq, flatten, omit, pick, pickBy, keys, reduce, filter, get, merge, first, map, isArray, isEmpty, isPlainObject} from 'lodash'
 import {stringify} from 'querystringify'
 
 import {IConfig, cleanConfig} from './config'
@@ -88,6 +88,7 @@ const validateParams = (action: IAction, params, config): boolean => {
 
 const resolve = async (objects, schema, config) => {
   if (isEmpty(objects)) return []
+  if (schema === '*') return objects
 
   merge(schema, {
     '@context': true,
@@ -96,17 +97,31 @@ const resolve = async (objects, schema, config) => {
     '@associations': true,
   })
 
-  const associations = pickBy(schema, isPlainObject)
+  const refs = uniq(flatten(map(objects, x => keys(x['@associations']))))
+  const associations = reduce(schema, (acc, val, key) => {
+    // detecting associations
+    if (isPlainObject(val)) {
+      // prop is an association if nested schema is provided
+      return merge(acc, { [key]: val })
+    }
+    else if (includes(refs, key)) {
+      // prop is an association if any object's context has a reference to it
+      return merge(acc, { [key]: '*' })
+    }
+    else {
+      return acc
+    }
+  }, {})
 
   const promises = map(associations, async (assocSchema, assocName) => {
     try {
       const result = await fetch(objects, assocName, config)
       const resolved = await resolve(result.objects, assocSchema, config)
-      return assign(objects, resolved, assocName, config)
+      assign(objects, resolved, assocName, config)
     }
     catch (err) {
       // if we fail to resolve an association, continue anyways
-      return assign(objects, [], assocName, config)
+      assign(objects, [], assocName, config)
       log(`failed to resolve association ${assocName}`)
       if (config.verbose) log(err, objects, schema)
       return objects
