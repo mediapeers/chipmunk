@@ -299,6 +299,74 @@ describe('action', () => {
     })
   })
 
+  it('resolves schema with, skipping associations that cannot be resolved', async () => {
+    nock(config.endpoints.um)
+      .get(matches('/users'))
+      .reply(200, {
+        members: [
+          {
+            '@type': 'user',
+            '@context': 'https://um.api.mediapeers.mobi/v20140601/context/user',
+            '@id': 'https://um.api.mediapeers.mobi/v20140601/user/1',
+            organization: {
+              '@id': 'https://um.api.mediapeers.mobi/v20140601/organization/3',
+            },
+            id: 1,
+            first_name: 'philipp',
+            last_name: 'goetzinger',
+            gender: 'male'
+          },
+          {
+            '@type': 'user',
+            '@context': 'https://um.api.mediapeers.mobi/v20140601/context/user',
+            '@id': 'https://um.api.mediapeers.mobi/v20140601/user/2',
+            organization: {
+              '@id': 'https://um.api.mediapeers.mobi/v20140601/organization/3',
+            },
+            id: 2,
+            first_name: 'antonie',
+            gender: 'female'
+          },
+        ]
+      })
+
+      .get(matches('/organizations/3'))
+      .reply(404, {})
+
+    const expected = [
+      {
+        '@type': 'user',
+        '@context': 'https://um.api.mediapeers.mobi/v20140601/context/user',
+        '@id': 'https://um.api.mediapeers.mobi/v20140601/user/1',
+        '@associations': {
+          organization: 'https://um.api.mediapeers.mobi/v20140601/organization/3',
+        },
+        first_name: 'philipp',
+        last_name: 'goetzinger',
+        organization: null,
+      },
+      {
+        '@type': 'user',
+        '@context': 'https://um.api.mediapeers.mobi/v20140601/context/user',
+        '@id': 'https://um.api.mediapeers.mobi/v20140601/user/2',
+        '@associations': {
+          organization: 'https://um.api.mediapeers.mobi/v20140601/organization/3',
+        },
+        first_name: 'antonie',
+        organization: null,
+      },
+    ]
+
+    await chipmunk.run(async (ch) => {
+      const result = await ch.action('um.user', 'query', {
+        proxy: false,
+        schema: 'first_name, last_name, organization { name }'
+      })
+
+      expect(result.objects).to.eql(expected)
+    })
+  })
+
   it('returns raw results', async () => {
     nock(config.endpoints.um)
       .get(matches('/users'))
