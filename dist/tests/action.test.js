@@ -272,6 +272,69 @@ describe('action', () => {
             chai_1.expect(result.objects).to.eql(expected);
         }));
     }));
+    it('resolves schema with, skipping associations that cannot be resolved', () => __awaiter(this, void 0, void 0, function* () {
+        nock_1.default(config.endpoints.um)
+            .get(setup_1.matches('/users'))
+            .reply(200, {
+            members: [
+                {
+                    '@type': 'user',
+                    '@context': 'https://um.api.mediapeers.mobi/v20140601/context/user',
+                    '@id': 'https://um.api.mediapeers.mobi/v20140601/user/1',
+                    organization: {
+                        '@id': 'https://um.api.mediapeers.mobi/v20140601/organization/3',
+                    },
+                    id: 1,
+                    first_name: 'philipp',
+                    last_name: 'goetzinger',
+                    gender: 'male'
+                },
+                {
+                    '@type': 'user',
+                    '@context': 'https://um.api.mediapeers.mobi/v20140601/context/user',
+                    '@id': 'https://um.api.mediapeers.mobi/v20140601/user/2',
+                    organization: {
+                        '@id': 'https://um.api.mediapeers.mobi/v20140601/organization/3',
+                    },
+                    id: 2,
+                    first_name: 'antonie',
+                    gender: 'female'
+                },
+            ]
+        })
+            .get(setup_1.matches('/organizations/3'))
+            .reply(404, {});
+        const expected = [
+            {
+                '@type': 'user',
+                '@context': 'https://um.api.mediapeers.mobi/v20140601/context/user',
+                '@id': 'https://um.api.mediapeers.mobi/v20140601/user/1',
+                '@associations': {
+                    organization: 'https://um.api.mediapeers.mobi/v20140601/organization/3',
+                },
+                first_name: 'philipp',
+                last_name: 'goetzinger',
+                organization: null,
+            },
+            {
+                '@type': 'user',
+                '@context': 'https://um.api.mediapeers.mobi/v20140601/context/user',
+                '@id': 'https://um.api.mediapeers.mobi/v20140601/user/2',
+                '@associations': {
+                    organization: 'https://um.api.mediapeers.mobi/v20140601/organization/3',
+                },
+                first_name: 'antonie',
+                organization: null,
+            },
+        ];
+        yield chipmunk.run((ch) => __awaiter(this, void 0, void 0, function* () {
+            const result = yield ch.action('um.user', 'query', {
+                proxy: false,
+                schema: 'first_name, last_name, organization { name }'
+            });
+            chai_1.expect(result.objects).to.eql(expected);
+        }));
+    }));
     it('returns raw results', () => __awaiter(this, void 0, void 0, function* () {
         nock_1.default(config.endpoints.um)
             .get(setup_1.matches('/users'))

@@ -71,6 +71,7 @@ const resolve = (objects, schema, config) => __awaiter(this, void 0, void 0, fun
             return association_1.assign(objects, resolved, assocName, config);
         }
         catch (err) {
+            return association_1.assign(objects, [], assocName, config);
             log_1.default(`failed to resolve association ${assocName}`);
             if (config.verbose)
                 log_1.default(err, objects, schema);
