@@ -57,21 +57,34 @@ const validateParams = (action, params, config) => {
 const resolve = (objects, schema, config) => __awaiter(this, void 0, void 0, function* () {
     if (lodash_1.isEmpty(objects))
         return [];
+    if (schema === '*')
+        return objects;
     lodash_1.merge(schema, {
         '@context': true,
         '@id': true,
         '@type': true,
         '@associations': true,
     });
-    const associations = lodash_1.pickBy(schema, lodash_1.isPlainObject);
+    const refs = lodash_1.uniq(lodash_1.flatten(lodash_1.map(objects, x => lodash_1.keys(x['@associations']))));
+    const associations = lodash_1.reduce(schema, (acc, val, key) => {
+        if (lodash_1.isPlainObject(val)) {
+            return lodash_1.merge(acc, { [key]: val });
+        }
+        else if (lodash_1.includes(refs, key)) {
+            return lodash_1.merge(acc, { [key]: '*' });
+        }
+        else {
+            return acc;
+        }
+    }, {});
     const promises = lodash_1.map(associations, (assocSchema, assocName) => __awaiter(this, void 0, void 0, function* () {
         try {
             const result = yield association_1.fetch(objects, assocName, config);
             const resolved = yield resolve(result.objects, assocSchema, config);
-            return association_1.assign(objects, resolved, assocName, config);
+            association_1.assign(objects, resolved, assocName, config);
         }
         catch (err) {
-            return association_1.assign(objects, [], assocName, config);
+            association_1.assign(objects, [], assocName, config);
             log_1.default(`failed to resolve association ${assocName}`);
             if (config.verbose)
                 log_1.default(err, objects, schema);

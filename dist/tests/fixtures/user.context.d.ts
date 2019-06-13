@@ -443,6 +443,14 @@ declare const _default: {
                 exportable: boolean;
                 required: boolean;
             };
+            geo_scopes: {
+                type: string;
+                collection: boolean;
+                readable: boolean;
+                writable: boolean;
+                exportable: boolean;
+                required: boolean;
+            };
             responsible_user: {
                 type: string;
                 collection: boolean;
