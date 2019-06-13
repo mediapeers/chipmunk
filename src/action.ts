@@ -106,6 +106,7 @@ const resolve = async (objects, schema, config) => {
     }
     catch (err) {
       // if we fail to resolve an association, continue anyways
+      return assign(objects, [], assocName, config)
       log(`failed to resolve association ${assocName}`)
       if (config.verbose) log(err, objects, schema)
       return objects
