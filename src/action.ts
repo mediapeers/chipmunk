@@ -123,6 +123,7 @@ const resolve = async (objects, schema, config) => {
       // if we fail to resolve an association, continue anyways
       assign(objects, [], assocName, config)
       log(`failed to resolve association ${assocName}`)
+      log(err, objects, schema)
       if (config.verbose) log(err, objects, schema)
       return objects
     }
@@ -193,13 +194,12 @@ const performAction = async (appModel: string, actionName: string, opts: IAction
 
       each(objectContext.associations, (_def, name) => {
         const data = object[name]
-        if (object[name]) {
+
+        if (data) {
           object['@associations'][name] = isArray(data) ? map(data, '@id') : get(data, '@id')
         }
 
-        Object.defineProperty(object, name, {
-          get: () => associationNotLoaded(name)()
-        })
+        object[name] = null // initialize association data with null
       })
     })
 
