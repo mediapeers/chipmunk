@@ -86,6 +86,7 @@ const resolve = (objects, schema, config) => __awaiter(this, void 0, void 0, fun
         catch (err) {
             association_1.assign(objects, [], assocName, config);
             log_1.default(`failed to resolve association ${assocName}`);
+            log_1.default(err, objects, schema);
             if (config.verbose)
                 log_1.default(err, objects, schema);
             return objects;
@@ -141,12 +142,10 @@ const performAction = (appModel, actionName, opts, config) => __awaiter(this, vo
             object['@associations'] = {};
             lodash_1.each(objectContext.associations, (_def, name) => {
                 const data = object[name];
-                if (object[name]) {
+                if (data) {
                     object['@associations'][name] = lodash_1.isArray(data) ? lodash_1.map(data, '@id') : lodash_1.get(data, '@id');
                 }
-                Object.defineProperty(object, name, {
-                    get: () => exports.associationNotLoaded(name)()
-                });
+                object[name] = null;
             });
         }));
         yield Promise.all(promises);
