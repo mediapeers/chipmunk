@@ -23,7 +23,6 @@ exports.request = (config, headers) => {
     const req = superagent_1.default.agent();
     if (config.verbose)
         req.use(superdebug_1.default(console.info));
-    req.set({ 'Accept-Encoding': 'gzip,deflate' });
     headers = lodash_1.merge({}, config.headers, headers);
     lodash_1.each(headers, (value, key) => {
         if (!value)

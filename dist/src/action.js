@@ -138,6 +138,8 @@ const performAction = (appModel, actionName, opts, config) => __awaiter(this, vo
         objects = [response.body];
     if (!opts.raw) {
         const promises = lodash_1.map(objects, (object) => __awaiter(this, void 0, void 0, function* () {
+            if (!object['@context'])
+                return;
             const objectContext = yield context_1.default(object['@context'], config);
             object['@associations'] = {};
             lodash_1.each(objectContext.associations, (_def, name) => {
