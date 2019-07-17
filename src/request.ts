@@ -22,8 +22,6 @@ export const request = (config: IConfig, headers?: { [s: string]: any }): SuperA
 
   if (config.verbose) req.use(superdebug(console.info))
 
-  req.set({ 'Accept-Encoding' : 'gzip,deflate' })
-
   headers = merge({}, config.headers, headers)
 
   each(headers, (value, key) => {
