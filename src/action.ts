@@ -189,6 +189,8 @@ const performAction = async (appModel: string, actionName: string, opts: IAction
     // for this reason we have to check all possible contexts for association definitions
 
     const promises = map(objects, async (object) => {
+      if (!object['@context']) return // skip non JSONLD objects
+
       const objectContext = await getContext(object['@context'], config)
       object['@associations'] = {}
 
