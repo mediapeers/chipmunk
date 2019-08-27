@@ -139,7 +139,16 @@ const performAction = async (appModel: string, actionName: string, opts: IAction
   const action = context.action(actionName)
   const body = format(opts.body, opts.multi, opts.ROR)
   const uriTemplate = UriTemplate(action.template)
-  const params = merge({}, extractParamsFromBody(action, body), opts.params)
+  const params = merge(
+    {},
+    extractParamsFromBody(action, body),
+    // additionally also treat params like a body, to convert back 'object'-props (source) into template params
+    // helps when template variables don't match, like
+    // e.g. collection get: '/assets/{asset_id}/products/{product_ids}' and collection query: '/assets/{asset_ids}/products
+    //                                                                          ^^ asset_id vs asset_ids
+    extractParamsFromBody(action, opts.params),
+    opts.params
+  )
 
   validateParams(action, params, config)
 
