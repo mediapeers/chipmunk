@@ -100,7 +100,7 @@ const performAction = (appModel, actionName, opts, config) => __awaiter(this, vo
     const action = context.action(actionName);
     const body = format_1.default(opts.body, opts.multi, opts.ROR);
     const uriTemplate = uri_templates_1.default(action.template);
-    const params = lodash_1.merge({}, extractParamsFromBody(action, body), opts.params);
+    const params = lodash_1.merge({}, extractParamsFromBody(action, body), extractParamsFromBody(action, opts.params), opts.params);
     validateParams(action, params, config);
     const uri = uriTemplate.fillFromObject(params);
     let req;
