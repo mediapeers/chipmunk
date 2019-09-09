@@ -1,5 +1,5 @@
 import UriTemplate from 'uri-templates'
-import {first, some, find, compact, attempt, values, merge, pick, assign as write, reduce, map, get, flatten, each, isEmpty, isArray} from 'lodash'
+import {first, includes, some, find, compact, attempt, values, merge, pick, assign as write, reduce, map, get, flatten, each, isEmpty, isArray} from 'lodash'
 
 import {IConfig} from './config'
 import getContext, {IAction, IContext} from './context'
@@ -33,6 +33,7 @@ export const extractProps = (context: IContext, references) => {
           const value = values[mapping.variable]
           if (!value) return
           if (!result[mapping.source]) result[mapping.source] = []
+          if (includes(result[mapping.source], value)) return
 
           result[mapping.source].push(value)
         })
