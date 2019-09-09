@@ -5,6 +5,7 @@ import nock from 'nock'
 
 import createChipmunk from '../src'
 import {setup, matches} from './setup'
+import {emptyOrganizationAssociations} from './emptyAssociations'
 
 const config = setup()
 let chipmunk
@@ -25,22 +26,6 @@ describe('action', () => {
     await chipmunk.run(async (ch) => {
       const result = await ch.action('um.user', 'query')
       expect(result.objects.length).to.be.gt(1)
-    })
-  })
-
-  it('throws if trying to access (not yet) resolved association data', async () => {
-    const scope = nock(config.endpoints.um)
-      .get(matches('/users'))
-      .reply(200, { members: [
-        { '@context': 'https://um.api.mediapeers.mobi/v20140601/context/user', id: 'first' },
-        { '@context': 'https://um.api.mediapeers.mobi/v20140601/context/user', id: 'second' },
-      ]})
-
-    await chipmunk.run(async (ch) => {
-      const result = await ch.action('um.user', 'query')
-      expect(() => result.objects[0].organization).to.throw(/association not loaded/)
-      expect(() => result.objects[1].organization).to.throw(/association not loaded/)
-      expect(() => result.objects[1].country.name).to.throw(/association not loaded/)
     })
   })
 
@@ -362,6 +347,7 @@ describe('action', () => {
         first_name: 'philipp',
         last_name: 'goetzinger',
         organization: {
+          ...emptyOrganizationAssociations,
           '@type': 'organization',
           '@context': 'https://um.api.mediapeers.mobi/v20140601/context/organization',
           '@id': 'https://um.api.mediapeers.mobi/v20140601/organization/3',
@@ -379,6 +365,7 @@ describe('action', () => {
         },
         first_name: 'antonie',
         organization: {
+          ...emptyOrganizationAssociations,
           '@type': 'organization',
           '@context': 'https://um.api.mediapeers.mobi/v20140601/context/organization',
           '@id': 'https://um.api.mediapeers.mobi/v20140601/organization/3',

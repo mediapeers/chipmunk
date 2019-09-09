@@ -5,7 +5,6 @@ import nock from 'nock'
 
 import createChipmunk from '../src'
 import {extractProps} from '../src/association'
-import {associationNotLoaded} from '../src/action'
 import {setup, matches} from './setup'
 
 const config = setup()
@@ -176,14 +175,14 @@ describe('association', () => {
         {
           '@type': 'user',
           '@associations': { },
-          get organization() { return associationNotLoaded('organization')() },
+          organization: null,
         },
         {
           '@type': 'user',
           '@associations': {
             organization: 'https://um.api.mediapeers.mobi/v20140601/organization/105',
           },
-          get organization() { return associationNotLoaded('organization')() },
+          organization: null,
         },
       ]
 
@@ -213,7 +212,7 @@ describe('association', () => {
               'https://um.api.mediapeers.mobi/v20140601/geo_scope/SWZ',
             ],
           },
-          get geo_scopes() { return associationNotLoaded('geo_scopes')() },
+          geo_scopes: null,
         },
         {
           '@type': 'user',
@@ -224,7 +223,7 @@ describe('association', () => {
               'https://um.api.mediapeers.mobi/v20140601/geo_scope/UGA',
             ],
           },
-          get geo_scopes() { return associationNotLoaded('geo_scopes')() },
+          geo_scopes: null,
         },
       ]
 
@@ -257,7 +256,7 @@ describe('association', () => {
           '@associations': {
             phones: 'https://um.api.mediapeers.mobi/v20140601/users/1660/phones',
           },
-          get phones() { return associationNotLoaded('phones')() },
+          phones: null,
         },
         {
           '@type': 'user',
@@ -265,7 +264,7 @@ describe('association', () => {
           '@associations': {
             phones: 'https://um.api.mediapeers.mobi/v20140601/users/1661/phones',
           },
-          get phones() { return associationNotLoaded('phones')() },
+          phones: null,
         },
       ]
 

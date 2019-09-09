@@ -279,15 +279,6 @@ const performProxiedAction = async (appModel: string, actionName: string, opts: 
   return result
 }
 
-export const associationNotLoaded = (name) => {
-  return () => {
-    const err = new NotLoadedError(`'${name}' association not loaded`)
-    err.name = 'NotLoadedError'
-
-    throw err
-  }
-}
-
 export default async (appModel: string, actionName: string, opts: IActionOpts, config: IConfig): Promise<IResult> => {
   opts = merge({}, DEFAULT_OPTS, { proxy: !isEmpty(opts.schema) }, opts)
 
