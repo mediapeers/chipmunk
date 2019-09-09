@@ -35,6 +35,8 @@ exports.extractProps = (context, references) => {
                         return;
                     if (!result[mapping.source])
                         result[mapping.source] = [];
+                    if (lodash_1.includes(result[mapping.source], value))
+                        return;
                     result[mapping.source].push(value);
                 });
             });

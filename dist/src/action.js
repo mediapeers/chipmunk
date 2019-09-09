@@ -202,13 +202,6 @@ const performProxiedAction = (appModel, actionName, opts, config) => __awaiter(t
     };
     return result;
 });
-exports.associationNotLoaded = (name) => {
-    return () => {
-        const err = new NotLoadedError(`'${name}' association not loaded`);
-        err.name = 'NotLoadedError';
-        throw err;
-    };
-};
 exports.default = (appModel, actionName, opts, config) => __awaiter(this, void 0, void 0, function* () {
     opts = lodash_1.merge({}, DEFAULT_OPTS, { proxy: !lodash_1.isEmpty(opts.schema) }, opts);
     if (opts.proxy && lodash_1.isEmpty(opts.schema)) {

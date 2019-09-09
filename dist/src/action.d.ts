@@ -38,6 +38,5 @@ export interface IResult {
     };
     aggregations?: any;
 }
-export declare const associationNotLoaded: (name: any) => () => never;
 declare const _default: (appModel: string, actionName: string, opts: IActionOpts, config: IConfig) => Promise<IResult>;
 export default _default;

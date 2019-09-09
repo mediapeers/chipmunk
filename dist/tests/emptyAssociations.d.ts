@@ -1,0 +1,20 @@
+export declare const emptyOrganizationAssociations: {
+    addresses: any;
+    aliases: any;
+    bank_accounts: any;
+    country: any;
+    courier_services: any;
+    currency: any;
+    delivery_profiles: any;
+    geo_scopes: any;
+    groups: any;
+    im_contacts: any;
+    key_persons: any;
+    language: any;
+    legal_address: any;
+    phones: any;
+    responsible_user: any;
+    social_media_profiles: any;
+    urls: any;
+    users: any;
+};

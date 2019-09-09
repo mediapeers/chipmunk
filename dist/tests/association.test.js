@@ -17,7 +17,6 @@ const lodash_1 = require("lodash");
 const nock_1 = __importDefault(require("nock"));
 const src_1 = __importDefault(require("../src"));
 const association_1 = require("../src/association");
-const action_1 = require("../src/action");
 const setup_1 = require("./setup");
 const config = setup_1.setup();
 let chipmunk;
@@ -170,14 +169,14 @@ describe('association', () => {
                 {
                     '@type': 'user',
                     '@associations': {},
-                    get organization() { return action_1.associationNotLoaded('organization')(); },
+                    organization: null,
                 },
                 {
                     '@type': 'user',
                     '@associations': {
                         organization: 'https://um.api.mediapeers.mobi/v20140601/organization/105',
                     },
-                    get organization() { return action_1.associationNotLoaded('organization')(); },
+                    organization: null,
                 },
             ];
             const objects = [
@@ -204,7 +203,7 @@ describe('association', () => {
                             'https://um.api.mediapeers.mobi/v20140601/geo_scope/SWZ',
                         ],
                     },
-                    get geo_scopes() { return action_1.associationNotLoaded('geo_scopes')(); },
+                    geo_scopes: null,
                 },
                 {
                     '@type': 'user',
@@ -215,7 +214,7 @@ describe('association', () => {
                             'https://um.api.mediapeers.mobi/v20140601/geo_scope/UGA',
                         ],
                     },
-                    get geo_scopes() { return action_1.associationNotLoaded('geo_scopes')(); },
+                    geo_scopes: null,
                 },
             ];
             const objects = [
@@ -245,7 +244,7 @@ describe('association', () => {
                     '@associations': {
                         phones: 'https://um.api.mediapeers.mobi/v20140601/users/1660/phones',
                     },
-                    get phones() { return action_1.associationNotLoaded('phones')(); },
+                    phones: null,
                 },
                 {
                     '@type': 'user',
@@ -253,7 +252,7 @@ describe('association', () => {
                     '@associations': {
                         phones: 'https://um.api.mediapeers.mobi/v20140601/users/1661/phones',
                     },
-                    get phones() { return action_1.associationNotLoaded('phones')(); },
+                    phones: null,
                 },
             ];
             const objects = [

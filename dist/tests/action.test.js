@@ -17,6 +17,7 @@ const lodash_1 = require("lodash");
 const nock_1 = __importDefault(require("nock"));
 const src_1 = __importDefault(require("../src"));
 const setup_1 = require("./setup");
+const emptyAssociations_1 = require("./emptyAssociations");
 const config = setup_1.setup();
 let chipmunk;
 describe('action', () => {
@@ -33,20 +34,6 @@ describe('action', () => {
         yield chipmunk.run((ch) => __awaiter(this, void 0, void 0, function* () {
             const result = yield ch.action('um.user', 'query');
             chai_1.expect(result.objects.length).to.be.gt(1);
-        }));
-    }));
-    it('throws if trying to access (not yet) resolved association data', () => __awaiter(this, void 0, void 0, function* () {
-        const scope = nock_1.default(config.endpoints.um)
-            .get(setup_1.matches('/users'))
-            .reply(200, { members: [
-                { '@context': 'https://um.api.mediapeers.mobi/v20140601/context/user', id: 'first' },
-                { '@context': 'https://um.api.mediapeers.mobi/v20140601/context/user', id: 'second' },
-            ] });
-        yield chipmunk.run((ch) => __awaiter(this, void 0, void 0, function* () {
-            const result = yield ch.action('um.user', 'query');
-            chai_1.expect(() => result.objects[0].organization).to.throw(/association not loaded/);
-            chai_1.expect(() => result.objects[1].organization).to.throw(/association not loaded/);
-            chai_1.expect(() => result.objects[1].country.name).to.throw(/association not loaded/);
         }));
     }));
     it(`moves association reference into '@associations'`, () => __awaiter(this, void 0, void 0, function* () {
@@ -332,14 +319,7 @@ describe('action', () => {
                 },
                 first_name: 'philipp',
                 last_name: 'goetzinger',
-                organization: {
-                    '@type': 'organization',
-                    '@context': 'https://um.api.mediapeers.mobi/v20140601/context/organization',
-                    '@id': 'https://um.api.mediapeers.mobi/v20140601/organization/3',
-                    '@associations': {},
-                    id: 3,
-                    name: 'graefschaft',
-                },
+                organization: Object.assign({}, emptyAssociations_1.emptyOrganizationAssociations, { '@type': 'organization', '@context': 'https://um.api.mediapeers.mobi/v20140601/context/organization', '@id': 'https://um.api.mediapeers.mobi/v20140601/organization/3', '@associations': {}, id: 3, name: 'graefschaft' }),
             },
             {
                 '@type': 'user',
@@ -349,14 +329,7 @@ describe('action', () => {
                     organization: 'https://um.api.mediapeers.mobi/v20140601/organization/3',
                 },
                 first_name: 'antonie',
-                organization: {
-                    '@type': 'organization',
-                    '@context': 'https://um.api.mediapeers.mobi/v20140601/context/organization',
-                    '@id': 'https://um.api.mediapeers.mobi/v20140601/organization/3',
-                    '@associations': {},
-                    id: 3,
-                    name: 'graefschaft',
-                },
+                organization: Object.assign({}, emptyAssociations_1.emptyOrganizationAssociations, { '@type': 'organization', '@context': 'https://um.api.mediapeers.mobi/v20140601/context/organization', '@id': 'https://um.api.mediapeers.mobi/v20140601/organization/3', '@associations': {}, id: 3, name: 'graefschaft' }),
             },
         ];
         yield chipmunk.run((ch) => __awaiter(this, void 0, void 0, function* () {
