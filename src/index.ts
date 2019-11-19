@@ -10,6 +10,8 @@ import {
 } from './cache'
 import {enqueuePerformLater} from './watcher'
 
+export * from './cache'
+
 export interface ICache {
   set(key: string, value: any, opts?: ISetOpts): void
   get(key: string, opts?: ICallOpts): any
