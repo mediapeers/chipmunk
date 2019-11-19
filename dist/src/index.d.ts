@@ -2,6 +2,7 @@ import { IContext } from './context';
 import { IResult, IActionOpts } from './action';
 import { IConfig, cleanConfig } from './config';
 import { ICallOpts, ISetOpts, IUpdateOpts } from './cache';
+export * from './cache';
 export interface ICache {
     set(key: string, value: any, opts?: ISetOpts): void;
     get(key: string, opts?: ICallOpts): any;

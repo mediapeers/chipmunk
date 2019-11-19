@@ -7,6 +7,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+function __export(m) {
+    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+}
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -26,6 +29,7 @@ const config_1 = __importStar(require("./config"));
 exports.cleanConfig = config_1.cleanConfig;
 const cache_1 = require("./cache");
 const watcher_1 = require("./watcher");
+__export(require("./cache"));
 exports.default = (...overrides) => {
     let config = config_1.default.apply(null, overrides);
     const callOpts = (opts) => lodash_1.merge({ engine: config.cache.default }, opts);
